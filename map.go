@@ -12,6 +12,8 @@ var (
 	mapImage         *ebiten.Image
 	playerX, playerY float64 = 400, 300
 	playerSpeed      float64 = 3
+	X, Y             float64
+	Zoom             float64
 
 	// Sprites par direction
 	upSprites    []*ebiten.Image
@@ -119,5 +121,6 @@ func DrawMap(screen *ebiten.Image) {
 		opts := &ebiten.DrawImageOptions{}
 		opts.GeoM.Translate(playerX, playerY)
 		screen.DrawImage(currentSprites[index], opts)
+
 	}
 }

@@ -8,62 +8,64 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
-// InventaireGUI gère l'affichage graphique de l'inventaire
 type InventaireGUI struct {
-	Personnage *Personnage
-	Visible    bool
-	keyPrevP   bool // pour détecter la touche juste pressée
-
+	player   *Personnage
+	open     bool
+	keyPrevP bool
 }
 
-// NewInventaireGUI crée une nouvelle interface d'inventaire
 func NewInventaireGUI(p *Personnage) *InventaireGUI {
-	return &InventaireGUI{
-		Personnage: p,
-		Visible:    false,
-		keyPrevP:   false,
-	}
+	return &InventaireGUI{player: p}
 }
 
-// Update détecte l'appui sur la touche P pour ouvrir/fermer l'inventaire
 func (inv *InventaireGUI) Update() {
+	// Toggle inventaire avec P
 	keyP := ebiten.IsKeyPressed(ebiten.KeyP)
-
-	// Détecte la touche juste pressée
 	if keyP && !inv.keyPrevP {
-		inv.Visible = !inv.Visible
+		inv.open = !inv.open
 	}
-
 	inv.keyPrevP = keyP
 }
 
-// Draw affiche l'inventaire sur l'écran
 func (inv *InventaireGUI) Draw(screen *ebiten.Image) {
-	if !inv.Visible {
+	if !inv.open {
 		return
 	}
 
+	// Taille de l’inventaire
+	screenW, screenH := screen.Size()
+	width, height := screenW/2, screenH/2
+	x := (screenW - width) / 2
+	y := (screenH - height) / 2
+
 	// Fond semi-transparent
-	screen.Fill(color.RGBA{0, 0, 0, 200})
+	bg := ebiten.NewImage(width, height)
+	bg.Fill(color.RGBA{0, 0, 0, 180}) // noir transparent
+	opts := &ebiten.DrawImageOptions{}
+	opts.GeoM.Translate(float64(x), float64(y))
+	screen.DrawImage(bg, opts)
 
-	// Titre
-	ebitenutil.DebugPrintAt(screen, "INVENTAIRE", 20, 20)
+	// Titre inventaire
+	ebitenutil.DebugPrintAt(screen, "🎒 INVENTAIRE", x+20, y+20)
 
-	// Liste des items
-	y := 50
-	if len(inv.Personnage.Inventory) == 0 {
-		ebitenutil.DebugPrintAt(screen, "(vide)", 20, y)
-	} else {
-		itemCount := make(map[string]int)
-		for _, item := range inv.Personnage.Inventory {
-			itemCount[item]++
-		}
-		for item, count := range itemCount {
-			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("- %s x%d", item, count), 20, y)
-			y += 20
-		}
+	// Afficher argent
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("💰 Or: %d", inv.player.Money), x+20, y+50)
+
+	// Grille des items
+	colSize := 4 // 4 items par ligne
+	cellW, cellH := 100, 40
+	startY := y + 80
+
+	if len(inv.player.Inventory) == 0 {
+		ebitenutil.DebugPrintAt(screen, "(vide)", x+20, startY)
+		return
 	}
 
-	// Argent
-	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Argent: %d", inv.Personnage.Money), 20, y+20)
+	for i, item := range inv.player.Inventory {
+		col := i % colSize
+		row := i / colSize
+		itemX := x + 20 + col*cellW
+		itemY := startY + row*cellH
+		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("• %s", item), itemX, itemY)
+	}
 }

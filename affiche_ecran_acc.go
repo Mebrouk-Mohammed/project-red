@@ -29,6 +29,12 @@ type Game struct {
 	videoEnded    bool
 	inventaire    *InventaireGUI
 	player        *Personnage
+
+	camera Camera
+}
+type Camera struct {
+	X, Y float64 // Position de la caméra
+	Zoom float64 // Facteur de zoom
 }
 
 // NewGame charge les frames de la vidéo
@@ -45,6 +51,11 @@ func NewGame() *Game {
 
 		player:     player,
 		inventaire: NewInventaireGUI(player),
+		camera: Camera{
+			X:    0,
+			Y:    0,
+			Zoom: 1.0, // zoom normal
+		},
 	}
 	// Chargement des frames vidéo
 	totalFrames := 150
@@ -128,6 +139,32 @@ func (g *Game) Update() error {
 			}
 			g.lastFrameTime = now
 		}
+	}
+	// Zoom +
+	if ebiten.IsKeyPressed(ebiten.KeyKPAdd) || ebiten.IsKeyPressed(ebiten.KeyEqual) {
+		g.camera.Zoom += 0.01
+	}
+	// Zoom -
+	if ebiten.IsKeyPressed(ebiten.KeyKPSubtract) || ebiten.IsKeyPressed(ebiten.KeyMinus) {
+		if g.camera.Zoom > 0.2 { // empêche de trop dézoomer
+			g.camera.Zoom -= 0.01
+		}
+	}
+
+	// Déplacements caméra (flèches)
+	if ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
+		g.camera.Y -= 5
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
+		g.camera.Y += 5
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
+		g.camera.X -= 5
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
+		g.camera.X += 5
+	}
+	if g.inventaire != nil {
 	}
 	g.inventaire.Update()
 
