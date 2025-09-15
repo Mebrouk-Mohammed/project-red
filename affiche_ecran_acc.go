@@ -41,10 +41,15 @@ type Camera struct {
 // NewGame charge les frames de la vidéo
 func NewGame() *Game {
 	player := &Personnage{
-		Name:      "Héros",
-		Money:     1000,
-		Inventory: []string{"Épée", "Potion"},
-	}
+	Name:      "Héros",
+	Life:      100,
+	MaxLife:   100,
+	Shield:    0,
+	MaxShield: 50,
+	Strength:  10,
+	Money:     100,
+	Inventory: []string{"Épée", "Potion"},
+}
 
 	g := &Game{
 		frameDelay: time.Millisecond * 42,
@@ -196,7 +201,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		// Quand on quitte le menu -> afficher la map
 		DrawMap(screen)
 		g.inventaire.Draw(screen)
-		g.marchand.Draw(screen)  
+		g.marchand.Draw(screen) 
+		g.player.DrawBars(screen) 
 
 	}
 
