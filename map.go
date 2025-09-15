@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -9,50 +10,114 @@ import (
 
 var (
 	mapImage         *ebiten.Image
-	playerImage      *ebiten.Image
-	playerX, playerY float64 = 400, 300 // position initiale (centre écran)
+	playerX, playerY float64 = 400, 300
 	playerSpeed      float64 = 3
+
+	// Sprites par direction
+	upSprites    []*ebiten.Image
+	downSprites  []*ebiten.Image
+	leftSprites  []*ebiten.Image
+	rightSprites []*ebiten.Image
+
+	currentSprites []*ebiten.Image
+	index          int
+	lastUpdate     time.Time
 )
 
-// Charger la map PNG
 func LoadMap() {
-	img, _, err := ebitenutil.NewImageFromFile("map_v1.png") // <-- mets ton PNG ici
+	// Charger la map
+	img, _, err := ebitenutil.NewImageFromFile("assets/map_v1.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 	mapImage = img
 
-	png, _, err := ebitenutil.NewImageFromFile("player.png") // 👉 ton perso
-	if err != nil {
-		log.Fatal(err)
+	// Charger les sprites par direction
+	upSprites = loadImages([]string{
+		"assets/perso/back-step1.png",
+		"assets/perso/back-step2.png",
+		"assets/perso/back.png",
+	})
+
+	downSprites = loadImages([]string{
+		"assets/perso/front.png",
+		"assets/perso/front.png", // tu peux dupliquer pour plus de frames
+	})
+
+	//leftSprites = loadImages([]string{
+	//	"assets/perso/left-step1.png",
+	//	"assets/perso/left-step2.png",
+	//})
+
+	//rightSprites = loadImages([]string{
+	//	"assets/perso/right-step1.png",
+	//	"assets/perso/right-step2.png",
+	//})
+
+	// Par défaut, face vers le bas
+	currentSprites = downSprites
+	lastUpdate = time.Now()
+}
+
+func loadImages(paths []string) []*ebiten.Image {
+	var imgs []*ebiten.Image
+	for _, f := range paths {
+		img, _, err := ebitenutil.NewImageFromFile(f)
+		if err != nil {
+			log.Fatal(err)
+		}
+		imgs = append(imgs, img)
 	}
-	playerImage = png
+	return imgs
 }
 
 func UpdatePlayer() {
-	if ebiten.IsKeyPressed(ebiten.KeyW) || ebiten.IsKeyPressed(ebiten.KeyZ) { // Z ou W = avancer
+	moving := false
+
+	// Déplacement et direction
+	if ebiten.IsKeyPressed(ebiten.KeyW) || ebiten.IsKeyPressed(ebiten.KeyZ) {
 		playerY -= playerSpeed
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyS) {
+		currentSprites = upSprites
+		moving = true
+	} else if ebiten.IsKeyPressed(ebiten.KeyS) {
 		playerY += playerSpeed
+		currentSprites = downSprites
+		moving = true
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyA) || ebiten.IsKeyPressed(ebiten.KeyQ) { // Q ou A = gauche
+	if ebiten.IsKeyPressed(ebiten.KeyA) || ebiten.IsKeyPressed(ebiten.KeyQ) {
 		playerX -= playerSpeed
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyD) {
+		currentSprites = leftSprites
+		moving = true
+	} else if ebiten.IsKeyPressed(ebiten.KeyD) {
 		playerX += playerSpeed
+		currentSprites = rightSprites
+		moving = true
+	}
+
+	// Animation : avancer seulement si le personnage bouge
+	if moving && time.Since(lastUpdate) > 150*time.Millisecond {
+		index++
+		if index >= len(currentSprites) {
+			index = 0
+		}
+		lastUpdate = time.Now()
+	} else if !moving {
+		// Reset sur la frame de repos quand il ne bouge pas
+		index = 0
 	}
 }
 
-// Dessiner la map
 func DrawMap(screen *ebiten.Image) {
+	// Dessiner la map
 	if mapImage != nil {
 		op := &ebiten.DrawImageOptions{}
 		screen.DrawImage(mapImage, op)
 	}
-	if playerImage != nil {
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(playerX, playerY)
-		screen.DrawImage(playerImage, op)
+
+	// Dessiner le personnage
+	if len(currentSprites) > 0 {
+		opts := &ebiten.DrawImageOptions{}
+		opts.GeoM.Translate(playerX, playerY)
+		screen.DrawImage(currentSprites[index], opts)
 	}
 }

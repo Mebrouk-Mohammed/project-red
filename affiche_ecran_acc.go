@@ -27,18 +27,29 @@ type Game struct {
 	lastFrameTime time.Time
 	frameDelay    time.Duration
 	videoEnded    bool
+	inventaire    *InventaireGUI
+	player        *Personnage
 }
 
 // NewGame charge les frames de la vidéo
 func NewGame() *Game {
-	g := &Game{
-		frameDelay: time.Millisecond * 42, // ~24 FPS
-		inMenu:     true,
+	player := &Personnage{
+		Name:      "Héros",
+		Money:     100,
+		Inventory: []string{"Épée", "Potion"},
 	}
 
+	g := &Game{
+		frameDelay: time.Millisecond * 42,
+		inMenu:     true,
+
+		player:     player,
+		inventaire: NewInventaireGUI(player),
+	}
+	// Chargement des frames vidéo
 	totalFrames := 150
 	for i := 1; i <= totalFrames; i++ {
-		path := fmt.Sprintf("video_frames/frame%03d.png", i)
+		path := fmt.Sprintf("assets/video_frames/frame%03d.png", i)
 		img, _, err := ebitenutil.NewImageFromFile(path)
 		if err != nil {
 			log.Println("Impossible de charger l'image :", path, err)
@@ -48,6 +59,7 @@ func NewGame() *Game {
 	}
 
 	g.lastFrameTime = time.Now()
+
 	return g
 }
 
@@ -55,7 +67,7 @@ func NewGame() *Game {
 func playMusic() {
 	audioCtx = audio.NewContext(44100)
 
-	data, err := os.ReadFile("menu.mp3") // <-- mets ton mp3 ici
+	data, err := os.ReadFile("assets/menu.mp3") // <-- mets ton mp3 ici
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -76,9 +88,14 @@ func playMusic() {
 
 // Update gère la logique du jeu
 func (g *Game) Update() error {
+	if g.inventaire != nil {
+		g.inventaire.Update()
+	}
+
 	if ebiten.IsKeyPressed(ebiten.KeyEscape) {
 		return ebiten.Termination
 	}
+
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 		x, y := ebiten.CursorPosition()
 
@@ -112,6 +129,7 @@ func (g *Game) Update() error {
 			g.lastFrameTime = now
 		}
 	}
+	g.inventaire.Update()
 
 	return nil
 }
@@ -137,7 +155,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	} else {
 		// Quand on quitte le menu -> afficher la map
 		DrawMap(screen)
+		g.inventaire.Draw(screen)
+
 	}
+
 }
 
 // Layout
@@ -162,4 +183,5 @@ func main() {
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
 	}
+
 }
