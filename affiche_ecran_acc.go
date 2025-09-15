@@ -29,6 +29,7 @@ type Game struct {
 	videoEnded    bool
 	inventaire    *InventaireGUI
 	player        *Personnage
+	marchand   *MenuMarchand
 
 	camera Camera
 }
@@ -41,7 +42,7 @@ type Camera struct {
 func NewGame() *Game {
 	player := &Personnage{
 		Name:      "Héros",
-		Money:     100,
+		Money:     1000,
 		Inventory: []string{"Épée", "Potion"},
 	}
 
@@ -51,6 +52,7 @@ func NewGame() *Game {
 
 		player:     player,
 		inventaire: NewInventaireGUI(player),
+		marchand:   NewMenuMarchand(player),
 		camera: Camera{
 			X:    0,
 			Y:    0,
@@ -167,6 +169,7 @@ func (g *Game) Update() error {
 	if g.inventaire != nil {
 	}
 	g.inventaire.Update()
+	g.marchand.Update()
 
 	return nil
 }
@@ -193,6 +196,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		// Quand on quitte le menu -> afficher la map
 		DrawMap(screen)
 		g.inventaire.Draw(screen)
+		g.marchand.Draw(screen)  
 
 	}
 

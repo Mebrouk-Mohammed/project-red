@@ -28,7 +28,7 @@ var (
 
 func LoadMap() {
 	// Charger la map
-	img, _, err := ebitenutil.NewImageFromFile("assets/map_v1.png")
+	img, _, err := ebitenutil.NewImageFromFile("assets/mapdV.png")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -110,6 +110,7 @@ func UpdatePlayer() {
 }
 
 func DrawMap(screen *ebiten.Image) {
+	
 	// Dessiner la map
 	if mapImage != nil {
 		op := &ebiten.DrawImageOptions{}
