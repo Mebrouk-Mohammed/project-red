@@ -40,8 +40,8 @@ func InitMonsters() {
 
 	scorpion := &Monster{
 		Name:       "Scorpion",
-		X:          1200,
-		Y:          500,
+		X:          1000,
+		Y:          300,
 		Sprites:    loadAndScale([]string{"assets/scorpion1.png"}, 0.20),
 		Speed:      2,
 		LastUpdate: time.Now(),
@@ -49,8 +49,8 @@ func InitMonsters() {
 
 	hyene := &Monster{
 		Name:       "Hyène",
-		X:          1200,
-		Y:          800,
+		X:          350,
+		Y:          650,
 		Sprites:    loadAndScale([]string{"assets/hyene1.png"}, 0.20),
 		Speed:      1,
 		LastUpdate: time.Now(),
