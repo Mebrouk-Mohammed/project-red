@@ -63,7 +63,7 @@ func initSprites() {
 
 	leftSprites = loadAndScale([]string{
 		"assets/perso/left-step1.png",
-		"assets/perso/left-step2.png",
+		"assets/perso/left-step1z.png",
 		"assets/perso/left-step3.png",
 	}, 0.25)
 
@@ -99,14 +99,15 @@ func LoadMap() {
 	}, 0.25)
 
 	leftSprites = loadAndScale([]string{
+		"assets/perso/left-step4.png",
+		"assets/perso/left-step5.png",
 		"assets/perso/left-step1.png",
-		"assets/perso/left-step2.png",
-		"assets/perso/left-step3.png",
 	}, 0.25)
 
 	rightSprites = loadAndScale([]string{
 		"assets/perso/right-step1-.png",
 		"assets/perso/right-step3.png",
+		"assets/perso/right-step4.png",
 	}, 0.25)
 
 }
@@ -173,6 +174,7 @@ func UpdatePlayer() {
 		// Reset sur la frame de repos quand il ne bouge pas
 		index = 0
 	}
+
 }
 
 func DrawMap(screen *ebiten.Image) {
@@ -198,10 +200,12 @@ func DrawMap(screen *ebiten.Image) {
 
 	// Dessiner le personnage
 	if len(currentSprites) > 0 {
+		if index >= len(currentSprites) {
+			index = 0
+		}
 		opts := &ebiten.DrawImageOptions{}
 		opts.GeoM.Translate(playerX, playerY)
 		screen.DrawImage(currentSprites[index], opts)
-
 	}
 
 }

@@ -106,6 +106,12 @@ func playMusic() {
 
 // Update gère la logique du jeu
 func (g *Game) Update() error {
+	if inCombat {
+		// Si on est en combat, on ne met à jour QUE le combat
+		UpdateCombat()
+		return nil
+	}
+
 	if g.inventaire != nil {
 		g.inventaire.Update()
 	}
@@ -175,6 +181,8 @@ func (g *Game) Update() error {
 	}
 	g.inventaire.Update()
 	g.marchand.Update()
+	UpdateMonsters()
+	CheckCollisionWithPlayerCombat()
 
 	return nil
 }
@@ -203,6 +211,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.inventaire.Draw(screen)
 		g.marchand.Draw(screen)
 		g.player.DrawBars(screen)
+		DrawMonsters(screen)
+		DrawCombatMessage(screen)
+		DrawCombatScreen(screen)
 
 	}
 
@@ -216,6 +227,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 func main() {
 	// Charger la map dès le départ
 	LoadMap()
+	InitMonsters()
+	InitCombatGraphics()
 
 	game := NewGame()
 
