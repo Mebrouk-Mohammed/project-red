@@ -34,10 +34,12 @@ type ShopItem struct {
 func NewMenuMarchand(p *Personnage) *MenuMarchand {
 	items := []ShopItem{
 		{"Plante curative", 50},
+		{"Potion magique", 80},
+		{"Épée", 50},
 		{"Épée améliorée", 200},
 		{"Armure", 150},
-		{"Arc", 120},
-		{"Potion magique", 80},
+		{"Botte", 200},
+		{"Chapeau", 200},
 	}
 	return &MenuMarchand{
 		player:    p,
