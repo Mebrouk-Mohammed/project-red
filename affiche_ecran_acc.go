@@ -205,6 +205,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		} else {
 			ebitenutil.DebugPrint(screen, "SAHARA DEFENDER\nFin de la vidéo.\nClique Start ou Leave")
 		}
+		if inCombat {
+			DrawCombatScreen(screen)
+			return
+		}
 	} else {
 		// Quand on quitte le menu -> afficher la map
 		DrawMap(screen)
@@ -228,7 +232,6 @@ func main() {
 	// Charger la map dès le départ
 	LoadMap()
 	InitMonsters()
-	InitCombatGraphics()
 
 	game := NewGame()
 

@@ -31,8 +31,8 @@ var combatFont = basicfont.Face7x13 // pas besoin de fichier .ttf
 func InitMonsters() {
 	serpent := &Monster{
 		Name:       "Serpent",
-		X:          800,
-		Y:          300,
+		X:          1300,
+		Y:          75,
 		Sprites:    loadAndScale([]string{"assets/serpent1.png"}, 0.07),
 		Speed:      1.5,
 		LastUpdate: time.Now(),
@@ -40,8 +40,8 @@ func InitMonsters() {
 
 	scorpion := &Monster{
 		Name:       "Scorpion",
-		X:          1000,
-		Y:          300,
+		X:          220,
+		Y:          350,
 		Sprites:    loadAndScale([]string{"assets/scorpion1.png"}, 0.20),
 		Speed:      2,
 		LastUpdate: time.Now(),

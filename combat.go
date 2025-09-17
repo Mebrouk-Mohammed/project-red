@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -9,33 +10,46 @@ import (
 )
 
 // ----------------- Variables de combat -----------------
-var inCombat bool                    // vrai si le joueur est en combat
-var combatMonster *Monster           // monstre actuel
-var combatPlayerImage *ebiten.Image  // image du joueur pour le combat
-var combatFonts = basicfont.Face7x13 // police intégrée
+var inCombat bool
+var combatMonster *Monster
+var combatPlayerImage *ebiten.Image
+var combatFonts = basicfont.Face7x13
 
-// Images fixes pour le combat
-var combatBackground *ebiten.Image
-var combatBorder *ebiten.Image
+var combatPlayerEntity *Entity
+var combatMonsterEntity *Entity
 
-// ----------------- Initialisation du combat -----------------
-func InitCombatGraphics() {
-	winW, winH := 1000, 400
-	combatBackground = ebiten.NewImage(winW, winH)
-	combatBackground.Fill(color.RGBA{237, 201, 175, 230}) // fond sable semi-transparent
+var basicPunch = Weapon{Name: "Coup de poing", Damage: 10}
+var sword = Weapon{Name: "Épée", Damage: 25}
 
-	combatBorder = ebiten.NewImage(winW, winH)
-	combatBorder.Fill(color.RGBA{139, 69, 19, 255}) // bordure marron
-}
+// Appui unique pour éviter multi-dégâts
+var aPressedLastFrame bool
+var ePressedLastFrame bool
+var spacePressedLastFrame bool
 
 // ----------------- Début du combat -----------------
 func StartCombat(monster *Monster, playerImg *ebiten.Image) {
 	if monster == nil || playerImg == nil {
 		return
 	}
+
 	inCombat = true
 	combatMonster = monster
 	combatPlayerImage = playerImg
+
+	// PV joueur
+	combatPlayerEntity = &Entity{Name: "Joueur", Health: 100}
+
+	// PV monstre selon type
+	hp := 50
+	switch monster.Name {
+	case "Serpent":
+		hp = 100
+	case "Scorpion":
+		hp = 50
+	case "Hyene":
+		hp = 200
+	}
+	combatMonsterEntity = &Entity{Name: monster.Name, Health: hp}
 }
 
 // ----------------- Fin du combat -----------------
@@ -43,6 +57,11 @@ func EndCombat() {
 	inCombat = false
 	combatMonster = nil
 	combatPlayerImage = nil
+	combatPlayerEntity = nil
+	combatMonsterEntity = nil
+	aPressedLastFrame = false
+	ePressedLastFrame = false
+	spacePressedLastFrame = false
 }
 
 // ----------------- Mise à jour du combat -----------------
@@ -51,15 +70,38 @@ func UpdateCombat() {
 		return
 	}
 
-	// Quitter le combat avec Escape
-	if ebiten.IsKeyPressed(ebiten.KeyEscape) {
+	// Quitter combat avec SPACE
+	spacePressed := ebiten.IsKeyPressed(ebiten.KeySpace)
+	if spacePressed && !spacePressedLastFrame {
+		EndCombat()
+		return
+	}
+	spacePressedLastFrame = spacePressed
+
+	// Attaque simple "A"
+	aPressed := ebiten.IsKeyPressed(ebiten.KeyA)
+	if aPressed && !aPressedLastFrame && combatMonsterEntity.Health > 0 {
+		combatMonsterEntity.TakeDamage(basicPunch.Damage)
+	}
+	aPressedLastFrame = aPressed
+
+	// Attaque épée "E"
+	ePressed := ebiten.IsKeyPressed(ebiten.KeyE)
+	if ePressed && !ePressedLastFrame && combatMonsterEntity.Health > 0 {
+		combatMonsterEntity.TakeDamage(sword.Damage)
+	}
+	ePressedLastFrame = ePressed
+
+	// Fin combat si monstre mort
+	if combatMonsterEntity.Health <= 0 {
+		RemoveMonsterFromMap(combatMonster)
 		EndCombat()
 	}
 }
 
 // ----------------- Dessin de la fenêtre de combat -----------------
 func DrawCombatScreen(screen *ebiten.Image) {
-	if !inCombat {
+	if !inCombat || combatMonsterEntity == nil || combatPlayerEntity == nil {
 		return
 	}
 
@@ -68,69 +110,69 @@ func DrawCombatScreen(screen *ebiten.Image) {
 	x := (screenW - winW) / 2
 	y := (screenH - winH) / 2
 
-	// Fond semi-transparent
-	if combatBackground != nil {
-		opts := &ebiten.DrawImageOptions{}
-		opts.GeoM.Translate(float64(x), float64(y))
-		screen.DrawImage(combatBackground, opts)
-	}
+	// Fond
+	win := ebiten.NewImage(winW, winH)
+	win.Fill(color.RGBA{237, 201, 175, 230})
+	opts := &ebiten.DrawImageOptions{}
+	opts.GeoM.Translate(float64(x), float64(y))
+	screen.DrawImage(win, opts)
 
-	// Bordure
-	if combatBorder != nil {
-		borderOpts := &ebiten.DrawImageOptions{}
-		borderOpts.GeoM.Translate(float64(x-4), float64(y-4))
-		screen.DrawImage(combatBorder, borderOpts)
-	}
+	// PV affichés
+	text.Draw(screen, "Combat contre "+combatMonsterEntity.Name, combatFonts, x+20, y+40, color.Black)
+	text.Draw(screen, "PV Joueur: "+itoa(combatPlayerEntity.Health), combatFonts, x+20, y+80, color.RGBA{0, 0, 255, 255})
+	text.Draw(screen, "PV "+combatMonsterEntity.Name+": "+itoa(combatMonsterEntity.Health), combatFonts, x+20, y+120, color.RGBA{255, 0, 0, 255})
 
-	// Texte centré
-	if combatMonster != nil {
-		msg := "DÉBUT DU COMBAT avec " + combatMonster.Name
-		bounds := text.BoundString(combatFonts, msg)
-		textX := x + (winW-bounds.Dx())/2
-		textY := y + 40
-		text.Draw(screen, msg, combatFonts, textX, textY, color.RGBA{255, 0, 0, 255})
-	}
-
-	// Dessiner le monstre à gauche
+	// Monstre à gauche
 	if combatMonster != nil && len(combatMonster.Sprites) > 0 {
-		monsterImg := combatMonster.Sprites[combatMonster.Index%len(combatMonster.Sprites)]
-		if monsterImg != nil {
-			monsterOpts := &ebiten.DrawImageOptions{}
-			monsterOpts.GeoM.Translate(float64(x+50), float64(y+100))
-			screen.DrawImage(monsterImg, monsterOpts)
-		}
+		img := combatMonster.Sprites[combatMonster.Index%len(combatMonster.Sprites)]
+		opts := &ebiten.DrawImageOptions{}
+		opts.GeoM.Translate(float64(x+50), float64(y+150))
+		screen.DrawImage(img, opts)
 	}
 
-	// Dessiner le joueur à droite
+	// Joueur à droite
 	if combatPlayerImage != nil {
-		playerOpts := &ebiten.DrawImageOptions{}
-		playerOpts.GeoM.Translate(float64(x+winW-150), float64(y+100))
-		screen.DrawImage(combatPlayerImage, playerOpts)
+		opts := &ebiten.DrawImageOptions{}
+		opts.GeoM.Translate(float64(x+winW-150), float64(y+150))
+		screen.DrawImage(combatPlayerImage, opts)
 	}
+
+	// Instructions
+	text.Draw(screen, "A = Attaque simple | E = Épée | SPACE = Fuir", combatFonts, x+20, y+winH-30, color.Black)
 }
 
-// ----------------- Vérification collision et déclenchement combat -----------------
+// ----------------- Collision pour lancer combat -----------------
 func CheckCollisionWithPlayerCombat() {
 	if inCombat || len(currentSprites) == 0 {
-		return // déjà en combat ou pas d'image joueur
+		return
 	}
 
 	playerW, playerH := 64.0, 64.0
-
 	for _, m := range monsters {
 		if len(m.Sprites) == 0 {
 			continue
 		}
-
-		monsterW, monsterH := m.Sprites[0].Size()
-
-		if playerX < m.X+float64(monsterW) &&
-			playerX+playerW > m.X &&
-			playerY < m.Y+float64(monsterH) &&
-			playerY+playerH > m.Y {
-			// Début combat → jeu en pause, monstres arrêtent de bouger et disparaissent
+		w, h := m.Sprites[0].Size()
+		if playerX < m.X+float64(w) && playerX+playerW > m.X &&
+			playerY < m.Y+float64(h) && playerY+playerH > m.Y {
 			StartCombat(m, currentSprites[index])
 			return
 		}
 	}
+}
+
+// ----------------- Supprimer monstre de la map -----------------
+func RemoveMonsterFromMap(monster *Monster) {
+	newList := []*Monster{}
+	for _, m := range monsters {
+		if m != monster {
+			newList = append(newList, m)
+		}
+	}
+	monsters = newList
+}
+
+// ----------------- Int -> string -----------------
+func itoa(num int) string {
+	return fmt.Sprintf("%d", num)
 }
