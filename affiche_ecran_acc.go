@@ -48,7 +48,7 @@ func NewGame() *Game {
 		Life:      100,
 		MaxLife:   100,
 		Shield:    0,
-		MaxShield: 50,
+		MaxShield: 100, // valeur de base
 		Strength:  10,
 		Money:     10000,
 		Inventory: []string{"Épée", "Potion"},

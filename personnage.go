@@ -111,8 +111,7 @@ func (p *Personnage) AfficherStatut() {
 // DrawBars dessine les barres de vie et de shield
 func (p *Personnage) DrawBars(screen *ebiten.Image) {
 	screenWidth, screenHeight := screen.Size()
-	// La largeur de la barre dépend de MaxShield (ex: 8px par point)
-	barWidth := int(float64(p.MaxShield) * 8)
+	barWidth := 400
 	barHeight := 25
 	padding := 10
 	x := (screenWidth - barWidth) / 2

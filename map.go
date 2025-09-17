@@ -8,6 +8,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
+// Variable globale pour synchronisation avec le jeu principal
+
 var (
 	mapImage         *ebiten.Image
 	playerX, playerY float64 = 1240, 600

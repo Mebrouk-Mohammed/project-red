@@ -7,7 +7,6 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text"
-	"golang.org/x/image/font"
 	"golang.org/x/image/font/basicfont"
 )
 
@@ -23,6 +22,7 @@ type MenuMarchand struct {
 	shopZoneY float64
 	shopZoneW float64
 	shopZoneH float64
+	 lastMousePressed bool // Pour détecter le front du clic
 }
 
 // ShopItem représente un objet à vendre
@@ -73,41 +73,41 @@ func (m *MenuMarchand) Update() {
 		return
 	}
 
-	// Achat si clic gauche
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
-		mx, my := ebiten.CursorPosition()
-		colSize := 5
-		cellW, cellH := 110, 50
-		monitor := ebiten.Monitor()
-		screenW, screenH := monitor.Size()
-		width, height := screenW*3/5, screenH*2/5
-		x := (screenW - width) / 2
-		y := (screenH - height) / 2
-		startX := x + 20
-		startY := y + 90
+ // Achat sur front du clic gauche
+ mousePressed := ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft)
+ if mousePressed && !m.lastMousePressed {
+ 	mx, my := ebiten.CursorPosition()
+ 	colSize := 5
+ 	cellW, cellH := 110, 50
+ 	screenW, screenH := ebiten.ScreenSizeInFullscreen()
+ 	width, height := screenW*3/5, screenH*2/5
+ 	x := (screenW - width) / 2
+ 	y := (screenH - height) / 2
+ 	startX := x + 20
+ 	startY := y + 90
 
-		for i, item := range m.shopItems {
-			col := i % colSize
-			row := i / colSize
-			itemX := startX + col*cellW
-			itemY := startY + row*cellH
+ 	for i, item := range m.shopItems {
+ 		col := i % colSize
+ 		row := i / colSize
+ 		itemX := startX + col*cellW
+ 		itemY := startY + row*cellH
 
-			if float64(mx) >= float64(itemX) && float64(mx) <= float64(itemX+cellW-10) &&
-				float64(my) >= float64(itemY) && float64(my) <= float64(itemY+cellH-10) {
+ 		if float64(mx) >= float64(itemX) && float64(mx) <= float64(itemX+cellW-10) &&
+ 			float64(my) >= float64(itemY) && float64(my) <= float64(itemY+cellH-10) {
 
-				if m.player.Money >= item.Price {
-					m.player.Money -= item.Price
-					// Ajoute juste l'item dans l'inventaire, sans effet automatique
-					m.player.Inventory = append(m.player.Inventory, item.Name)
-					m.message = fmt.Sprintf("%s ajouté à l'inventaire !", item.Name)
-					m.messageTime = time.Now()
-				} else {
-					m.message = "Pas assez d'or !"
-					m.messageTime = time.Now()
-				}
-			}
-		}
-	}
+ 			if m.player.Money >= item.Price {
+ 				m.player.Money -= item.Price
+ 				m.player.AjouterItem(item.Name) // applique effets automatiquement
+ 				m.message = fmt.Sprintf("Vous avez acheté %s pour %d pièces !", item.Name, item.Price)
+ 				m.messageTime = time.Now()
+ 			} else {
+ 				m.message = "Pas assez d'or !"
+ 				m.messageTime = time.Now()
+ 			}
+ 		}
+ 	}
+ }
+ m.lastMousePressed = mousePressed
 }
 
 // Draw affiche le menu marchand
@@ -116,11 +116,8 @@ func (m *MenuMarchand) Draw(screen *ebiten.Image) {
 		return
 	}
 
-	bounds := screen.Bounds()
-	screenW := bounds.Dx()
-	screenH := bounds.Dy()
-	width := screenW * 3 / 5
-	height := screenH * 2 / 5
+	screenW, screenH := screen.Size()
+	width, height := screenW*3/5, screenH*2/5
 	x := (screenW - width) / 2
 	y := (screenH - height) / 2
 	radius := 15
@@ -133,14 +130,12 @@ func (m *MenuMarchand) Draw(screen *ebiten.Image) {
 
 	// Titre
 	title := "🏜️ Marchand du Désert"
-	tBounds, _ := font.BoundString(face, title)
-	tW := (tBounds.Max.X - tBounds.Min.X).Ceil()
+	tW := text.BoundString(face, title).Dx()
 	text.Draw(screen, title, face, x+width/2-tW/2, y+30, color.RGBA{101, 67, 33, 255})
 
 	// Argent joueur
 	money := fmt.Sprintf("💰 Or: %d", m.player.Money)
-	mBounds, _ := font.BoundString(face, money)
-	tW = (mBounds.Max.X - mBounds.Min.X).Ceil()
+	tW = text.BoundString(face, money).Dx()
 	text.Draw(screen, money, face, x+width/2-tW/2, y+50, color.RGBA{139, 69, 19, 255})
 
 	// Affiche les items
@@ -166,16 +161,14 @@ func (m *MenuMarchand) Draw(screen *ebiten.Image) {
 		drawRoundedRect(screen, itemX, itemY, cellW-10, cellH-10, slotRadius, slotColor)
 
 		textStr := fmt.Sprintf("%s (%d)", item.Name, item.Price)
-	strBounds, _ := font.BoundString(face, textStr)
-	tW := (strBounds.Max.X - strBounds.Min.X).Ceil()
-	tH := (strBounds.Max.Y - strBounds.Min.Y).Ceil()
+		tW := text.BoundString(face, textStr).Dx()
+		tH := text.BoundString(face, textStr).Dy()
 		text.Draw(screen, textStr, face, itemX+(cellW-10)/2-tW/2, itemY+(cellH-10)/2+tH/2, color.RGBA{101, 67, 33, 255})
 	}
 
 	// Message achat ou erreur
 	if m.message != "" && time.Since(m.messageTime).Seconds() < 2 {
-		msgBounds, _ := font.BoundString(face, m.message)
-		msgW := (msgBounds.Max.X - msgBounds.Min.X).Ceil()
+		msgW := text.BoundString(face, m.message).Dx()
 		text.Draw(screen, m.message, face, x+width/2-msgW/2, y+height-20, color.RGBA{255, 0, 0, 255})
 	}
 }

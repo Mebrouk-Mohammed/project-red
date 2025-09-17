@@ -63,24 +63,6 @@ func (inv *InventaireGUI) Update() {
 				case "Potion magique":
 					inv.player.AjouterShield(30)
 					inv.message = fmt.Sprintf("%s utilise %s ! Shield: %d/%d", inv.player.Name, item, inv.player.Shield, inv.player.MaxShield)
-				case "Armure":
-					if inv.player.MaxShield < 50 {
-						inv.player.MaxShield = 50
-					}
-					inv.player.Shield = 0
-					inv.message = fmt.Sprintf("%s équipe %s ! MaxShield: %d", inv.player.Name, item, inv.player.MaxShield)
-				case "Chapeau":
-					if inv.player.MaxShield < 30 {
-						inv.player.MaxShield = 30
-					}
-					inv.player.Shield = 0
-					inv.message = fmt.Sprintf("%s équipe %s ! MaxShield: %d", inv.player.Name, item, inv.player.MaxShield)
-				case "Botte":
-					if inv.player.MaxShield < 20 {
-						inv.player.MaxShield = 20
-					}
-					inv.player.Shield = 0
-					inv.message = fmt.Sprintf("%s équipe %s ! MaxShield: %d", inv.player.Name, item, inv.player.MaxShield)
 				default:
 					inv.message = fmt.Sprintf("%s ne peut pas utiliser %s", inv.player.Name, item)
 				}
