@@ -175,6 +175,12 @@ func UpdatePlayer() {
 		index = 0
 	}
 
+	// Synchronisation avec la structure Personnage
+	if gameInstance != nil && gameInstance.player != nil {
+		gameInstance.player.PosX = playerX
+		gameInstance.player.PosY = playerY
+	}
+
 }
 
 func DrawMap(screen *ebiten.Image) {

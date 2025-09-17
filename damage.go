@@ -4,6 +4,17 @@ package main
 type Entity struct {
 	Name   string
 	Health int
+	Shield int
+}
+
+// Méthode pour soigner
+func (e *Entity) Soigner(val int) {
+	e.Health += val
+}
+
+// Méthode pour ajouter du shield
+func (e *Entity) AjouterShield(val int) {
+	e.Shield += val
 }
 
 // ----------------- Structure d'une arme -----------------

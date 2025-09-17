@@ -7,6 +7,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text"
+	"golang.org/x/image/font"
 	"golang.org/x/image/font/basicfont"
 )
 
@@ -44,10 +45,10 @@ func NewMenuMarchand(p *Personnage) *MenuMarchand {
 	return &MenuMarchand{
 		player:    p,
 		shopItems: items,
-		shopZoneX: 90, // coordonnées du marchand sur la map
-		shopZoneY: 60,
-		shopZoneW: 90, // largeur du sprite du marchand
-		shopZoneH: 60, // hauteur du sprite
+		shopZoneX: 193, // coordonnées du marchand sur la map
+		shopZoneY: 9,
+		shopZoneW: 120, // largeur du sprite du marchand
+		shopZoneH: 120, // hauteur du sprite
 	}
 }
 
@@ -77,7 +78,8 @@ func (m *MenuMarchand) Update() {
 		mx, my := ebiten.CursorPosition()
 		colSize := 5
 		cellW, cellH := 110, 50
-		screenW, screenH := ebiten.ScreenSizeInFullscreen()
+		monitor := ebiten.Monitor()
+		screenW, screenH := monitor.Size()
 		width, height := screenW*3/5, screenH*2/5
 		x := (screenW - width) / 2
 		y := (screenH - height) / 2
@@ -95,8 +97,9 @@ func (m *MenuMarchand) Update() {
 
 				if m.player.Money >= item.Price {
 					m.player.Money -= item.Price
-					m.player.AjouterItem(item.Name) // applique effets automatiquement
-					m.message = fmt.Sprintf("Vous avez acheté %s pour %d pièces !", item.Name, item.Price)
+					// Ajoute juste l'item dans l'inventaire, sans effet automatique
+					m.player.Inventory = append(m.player.Inventory, item.Name)
+					m.message = fmt.Sprintf("%s ajouté à l'inventaire !", item.Name)
 					m.messageTime = time.Now()
 				} else {
 					m.message = "Pas assez d'or !"
@@ -113,8 +116,11 @@ func (m *MenuMarchand) Draw(screen *ebiten.Image) {
 		return
 	}
 
-	screenW, screenH := screen.Size()
-	width, height := screenW*3/5, screenH*2/5
+	bounds := screen.Bounds()
+	screenW := bounds.Dx()
+	screenH := bounds.Dy()
+	width := screenW * 3 / 5
+	height := screenH * 2 / 5
 	x := (screenW - width) / 2
 	y := (screenH - height) / 2
 	radius := 15
@@ -127,12 +133,14 @@ func (m *MenuMarchand) Draw(screen *ebiten.Image) {
 
 	// Titre
 	title := "🏜️ Marchand du Désert"
-	tW := text.BoundString(face, title).Dx()
+	tBounds, _ := font.BoundString(face, title)
+	tW := (tBounds.Max.X - tBounds.Min.X).Ceil()
 	text.Draw(screen, title, face, x+width/2-tW/2, y+30, color.RGBA{101, 67, 33, 255})
 
 	// Argent joueur
 	money := fmt.Sprintf("💰 Or: %d", m.player.Money)
-	tW = text.BoundString(face, money).Dx()
+	mBounds, _ := font.BoundString(face, money)
+	tW = (mBounds.Max.X - mBounds.Min.X).Ceil()
 	text.Draw(screen, money, face, x+width/2-tW/2, y+50, color.RGBA{139, 69, 19, 255})
 
 	// Affiche les items
@@ -158,14 +166,16 @@ func (m *MenuMarchand) Draw(screen *ebiten.Image) {
 		drawRoundedRect(screen, itemX, itemY, cellW-10, cellH-10, slotRadius, slotColor)
 
 		textStr := fmt.Sprintf("%s (%d)", item.Name, item.Price)
-		tW := text.BoundString(face, textStr).Dx()
-		tH := text.BoundString(face, textStr).Dy()
+	strBounds, _ := font.BoundString(face, textStr)
+	tW := (strBounds.Max.X - strBounds.Min.X).Ceil()
+	tH := (strBounds.Max.Y - strBounds.Min.Y).Ceil()
 		text.Draw(screen, textStr, face, itemX+(cellW-10)/2-tW/2, itemY+(cellH-10)/2+tH/2, color.RGBA{101, 67, 33, 255})
 	}
 
 	// Message achat ou erreur
 	if m.message != "" && time.Since(m.messageTime).Seconds() < 2 {
-		msgW := text.BoundString(face, m.message).Dx()
+		msgBounds, _ := font.BoundString(face, m.message)
+		msgW := (msgBounds.Max.X - msgBounds.Min.X).Ceil()
 		text.Draw(screen, m.message, face, x+width/2-msgW/2, y+height-20, color.RGBA{255, 0, 0, 255})
 	}
 }
