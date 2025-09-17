@@ -14,10 +14,14 @@ import (
 type MenuMarchand struct {
 	player      *Personnage
 	open        bool
-	keyPrevG    bool
 	shopItems   []ShopItem
 	message     string
 	messageTime time.Time
+
+	shopZoneX float64
+	shopZoneY float64
+	shopZoneW float64
+	shopZoneH float64
 }
 
 // ShopItem représente un objet à vendre
@@ -26,7 +30,7 @@ type ShopItem struct {
 	Price int
 }
 
-// Création du menu marchand
+// NewMenuMarchand initialise le marchand
 func NewMenuMarchand(p *Personnage) *MenuMarchand {
 	items := []ShopItem{
 		{"Plante curative", 50},
@@ -35,24 +39,32 @@ func NewMenuMarchand(p *Personnage) *MenuMarchand {
 		{"Arc", 120},
 		{"Potion magique", 80},
 	}
-	return &MenuMarchand{player: p, shopItems: items}
+	return &MenuMarchand{
+		player:    p,
+		shopItems: items,
+		shopZoneX: 90, // coordonnées du marchand sur la map
+		shopZoneY: 60,
+		shopZoneW: 90, // largeur du sprite du marchand
+		shopZoneH: 60, // hauteur du sprite
+	}
 }
 
-// Mise à jour du menu : G pour toggle, Q pour fermer
+// Update gère l'ouverture automatique et les achats
 func (m *MenuMarchand) Update() {
-	keyG := ebiten.IsKeyPressed(ebiten.KeyG)
-	keyQ := ebiten.IsKeyPressed(ebiten.KeyQ)
+	playerX := m.player.PosX
+	playerY := m.player.PosY
+	playerW := m.player.Width
+	playerH := m.player.Height
 
-	// Toggle avec G
-	if keyG && !m.keyPrevG {
-		m.open = !m.open
-	}
-	// Fermer avec Q
-	if keyQ && m.open {
+	// Détecte collision joueur <-> zone du marchand
+	if playerX < m.shopZoneX+m.shopZoneW &&
+		playerX+playerW > m.shopZoneX &&
+		playerY < m.shopZoneY+m.shopZoneH &&
+		playerY+playerH > m.shopZoneY {
+		m.open = true
+	} else {
 		m.open = false
 	}
-
-	m.keyPrevG = keyG
 
 	if !m.open {
 		return
@@ -78,9 +90,10 @@ func (m *MenuMarchand) Update() {
 
 			if float64(mx) >= float64(itemX) && float64(mx) <= float64(itemX+cellW-10) &&
 				float64(my) >= float64(itemY) && float64(my) <= float64(itemY+cellH-10) {
+
 				if m.player.Money >= item.Price {
 					m.player.Money -= item.Price
-					m.player.Inventory = append(m.player.Inventory, item.Name)
+					m.player.AjouterItem(item.Name) // applique effets automatiquement
 					m.message = fmt.Sprintf("Vous avez acheté %s pour %d pièces !", item.Name, item.Price)
 					m.messageTime = time.Now()
 				} else {
@@ -92,7 +105,7 @@ func (m *MenuMarchand) Update() {
 	}
 }
 
-// Dessine le menu marchand
+// Draw affiche le menu marchand
 func (m *MenuMarchand) Draw(screen *ebiten.Image) {
 	if !m.open {
 		return
@@ -104,7 +117,7 @@ func (m *MenuMarchand) Draw(screen *ebiten.Image) {
 	y := (screenH - height) / 2
 	radius := 15
 
-	// Ombre et fond semi-transparent
+	// Fond et ombre
 	drawRoundedRect(screen, x+5, y+5, width, height, radius, color.RGBA{120, 80, 30, 180})
 	drawRoundedRect(screen, x, y, width, height, radius, color.RGBA{210, 180, 140, 230})
 
@@ -120,7 +133,7 @@ func (m *MenuMarchand) Draw(screen *ebiten.Image) {
 	tW = text.BoundString(face, money).Dx()
 	text.Draw(screen, money, face, x+width/2-tW/2, y+50, color.RGBA{139, 69, 19, 255})
 
-	// Grille des items
+	// Affiche les items
 	colSize := 5
 	cellW, cellH := 110, 50
 	startX := x + 20
@@ -137,19 +150,18 @@ func (m *MenuMarchand) Draw(screen *ebiten.Image) {
 		mx, my := ebiten.CursorPosition()
 		if float64(mx) >= float64(itemX) && float64(mx) <= float64(itemX+cellW-10) &&
 			float64(my) >= float64(itemY) && float64(my) <= float64(itemY+cellH-10) {
-			slotColor = color.RGBA{218, 165, 32, 230} // survol doré
+			slotColor = color.RGBA{218, 165, 32, 230}
 		}
 
 		drawRoundedRect(screen, itemX, itemY, cellW-10, cellH-10, slotRadius, slotColor)
 
-		// Texte centré dans le slot
 		textStr := fmt.Sprintf("%s (%d)", item.Name, item.Price)
 		tW := text.BoundString(face, textStr).Dx()
 		tH := text.BoundString(face, textStr).Dy()
 		text.Draw(screen, textStr, face, itemX+(cellW-10)/2-tW/2, itemY+(cellH-10)/2+tH/2, color.RGBA{101, 67, 33, 255})
 	}
 
-	// Affichage du message (achat ou pas assez d'or) pendant 2 secondes
+	// Message achat ou erreur
 	if m.message != "" && time.Since(m.messageTime).Seconds() < 2 {
 		msgW := text.BoundString(face, m.message).Dx()
 		text.Draw(screen, m.message, face, x+width/2-msgW/2, y+height-20, color.RGBA{255, 0, 0, 255})

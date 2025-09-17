@@ -55,15 +55,18 @@ func NewGame() *Game {
 		frameDelay: time.Millisecond * 42,
 		inMenu:     true,
 
-		player:     player,
-		inventaire: NewInventaireGUI(player),
-		marchand:   NewMenuMarchand(player),
+		player: player,
+		inventaire: &InventaireGUI{
+			player: player,
+		},
+		marchand: NewMenuMarchand(player),
 		camera: Camera{
 			X:    0,
 			Y:    0,
 			Zoom: 1.0, // zoom normal
 		},
 	}
+
 	// Chargement des frames vidéo
 	totalFrames := 150
 	for i := 1; i <= totalFrames; i++ {
@@ -177,12 +180,15 @@ func (g *Game) Update() error {
 	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
 		g.camera.X += 5
 	}
-	if g.inventaire != nil {
-	}
-	g.inventaire.Update()
-	g.marchand.Update()
+
 	UpdateMonsters()
 	CheckCollisionWithPlayerCombat()
+	if g.inventaire != nil {
+		g.inventaire.Update()
+	}
+	if g.marchand != nil {
+		g.marchand.Update()
+	}
 
 	return nil
 }
@@ -212,12 +218,13 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	} else {
 		// Quand on quitte le menu -> afficher la map
 		DrawMap(screen)
-		g.inventaire.Draw(screen)
+
 		g.marchand.Draw(screen)
 		g.player.DrawBars(screen)
 		DrawMonsters(screen)
 		DrawCombatMessage(screen)
 		DrawCombatScreen(screen)
+		g.inventaire.Draw(screen)
 
 	}
 

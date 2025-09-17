@@ -9,6 +9,11 @@ import (
 
 // Personnage représente le joueur
 type Personnage struct {
+	PosX   float64
+	PosY   float64
+	Width  float64
+	Height float64
+
 	Name      string
 	Life      int
 	MaxLife   int
