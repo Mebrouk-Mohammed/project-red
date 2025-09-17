@@ -26,15 +26,9 @@ type Personnage struct {
 
 // AjouterItem ajoute un item à l’inventaire et applique ses effets
 func (p *Personnage) AjouterItem(item string) {
-	p.Inventory = append(p.Inventory, item)
-	fmt.Printf("%s a ajouté %s à son inventaire.\n", p.Name, item)
-
-	switch item {
-	case "Plante curative":
-		p.Soigner(30)
-	case "Potion magique":
-		p.AjouterShield(20)
-	}
+	 p.Inventory = append(p.Inventory, item)
+	 fmt.Printf("%s a ajouté %s à son inventaire.\n", p.Name, item)
+	 // Les effets sont appliqués uniquement lors de l'utilisation dans l'inventaire
 }
 
 // RetirerItem retire un item de l’inventaire
