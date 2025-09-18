@@ -91,7 +91,7 @@ func NewGame() *Game {
 func playMusic() {
 	audioCtx = audio.NewContext(44100)
 
-	data, err := os.ReadFile("assets/menu.mp3") // <-- mets ton mp3 ici
+	data, err := os.ReadFile("assets/menu1.mp3") // <-- mets ton mp3 ici
 	if err != nil {
 		log.Fatal(err)
 	}

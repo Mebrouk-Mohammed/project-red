@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"image/color"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text"
@@ -20,6 +21,9 @@ var combatMonsterEntity *Entity
 
 var basicPunch = Weapon{Name: "Coup de poing", Damage: 10}
 var sword = Weapon{Name: "Épée", Damage: 25}
+// Message temporaire combat
+var combatTempMessage string
+var combatTempMsgTime time.Time
 
 // Tour par tour
 var playerTurn bool = true
@@ -145,7 +149,28 @@ func UpdateCombat() {
 		// --- Tour du monstre ---
 		if combatMonsterEntity.Health > 0 {
 			damage := 20 // valeur par défaut, à adapter si besoin
-			combatPlayerEntity.TakeDamage(damage)
+			// Applique les dégâts au joueur réel
+			if gameInstance != nil && gameInstance.player != nil {
+				oldShield := gameInstance.player.Shield
+				oldLife := gameInstance.player.Life
+				gameInstance.player.PrendreDegats(damage)
+				lostShield := oldShield - gameInstance.player.Shield
+				lostLife := oldLife - gameInstance.player.Life
+				if lostShield > 0 && lostLife > 0 {
+					combatTempMessage = fmt.Sprintf("Le monstre inflige %d dégâts ! Shield -%d, Vie -%d", damage, lostShield, lostLife)
+				} else if lostShield > 0 {
+					combatTempMessage = fmt.Sprintf("Le monstre inflige %d dégâts ! Shield -%d", damage, lostShield)
+				} else if lostLife > 0 {
+					combatTempMessage = fmt.Sprintf("Le monstre inflige %d dégâts ! Vie -%d", damage, lostLife)
+				} else {
+					combatTempMessage = fmt.Sprintf("Le monstre attaque !")
+				}
+				combatTempMsgTime = time.Now()
+			} else {
+				combatPlayerEntity.TakeDamage(damage)
+				combatTempMessage = fmt.Sprintf("Le monstre inflige %d dégâts !", damage)
+				combatTempMsgTime = time.Now()
+			}
 			fmt.Printf("%s attaque le joueur et inflige %d dégâts !\n", combatMonster.Name, damage)
 		}
 		playerTurn = true // fin du tour → revient au joueur
@@ -178,7 +203,14 @@ func DrawCombatScreen(screen *ebiten.Image) {
 
 	// PV affichés
 	text.Draw(screen, "Combat contre "+combatMonsterEntity.Name, combatFonts, x+20, y+40, color.Black)
-	text.Draw(screen, "PV Joueur: "+itoa(combatPlayerEntity.Health), combatFonts, x+20, y+80, color.RGBA{0, 0, 255, 255})
+	if gameInstance != nil && gameInstance.player != nil {
+		text.Draw(screen, "PV Joueur: "+itoa(gameInstance.player.Life)+"/"+itoa(gameInstance.player.MaxLife), combatFonts, x+20, y+80, color.RGBA{0, 0, 255, 255})
+		text.Draw(screen, "Shield: "+itoa(gameInstance.player.Shield)+"/"+itoa(gameInstance.player.MaxShield), combatFonts, x+20, y+110, color.RGBA{0, 128, 255, 200})
+		// Message temporaire dégâts
+		if combatTempMessage != "" && time.Since(combatTempMsgTime).Seconds() < 2 {
+			text.Draw(screen, combatTempMessage, combatFonts, x+20, y+140, color.RGBA{255, 0, 0, 255})
+		}
+	}
 	text.Draw(screen, "PV "+combatMonsterEntity.Name+": "+itoa(combatMonsterEntity.Health), combatFonts, x+20, y+120, color.RGBA{255, 0, 0, 255})
 
 	// Monstre à gauche
