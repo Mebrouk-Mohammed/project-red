@@ -21,6 +21,13 @@ var combatMonsterEntity *Entity
 var basicPunch = Weapon{Name: "Coup de poing", Damage: 10}
 var sword = Weapon{Name: "Épée", Damage: 25}
 
+// Tour par tour
+var playerTurn bool = true
+var bPressedLastFrame bool
+var vPressedLastFrame bool
+var shieldPotion int = 30 // valeur à adapter si besoin
+var healPotion int = 50   // valeur à adapter si besoin
+
 // Appui unique pour éviter multi-dégâts
 var aPressedLastFrame bool
 var ePressedLastFrame bool
@@ -35,6 +42,7 @@ func StartCombat(monster *Monster, playerImg *ebiten.Image) {
 	inCombat = true
 	combatMonster = monster
 	combatPlayerImage = playerImg
+	playerTurn = true
 
 	// PV joueur
 	combatPlayerEntity = &Entity{Name: "Joueur", Health: 100}
@@ -78,19 +86,70 @@ func UpdateCombat() {
 	}
 	spacePressedLastFrame = spacePressed
 
-	// Attaque simple "A"
-	aPressed := ebiten.IsKeyPressed(ebiten.KeyA)
-	if aPressed && !aPressedLastFrame && combatMonsterEntity.Health > 0 {
-		combatMonsterEntity.TakeDamage(basicPunch.Damage)
-	}
-	aPressedLastFrame = aPressed
+	if playerTurn {
+		// Attaque simple "A"
+		aPressed := ebiten.IsKeyPressed(ebiten.KeyA)
+		if aPressed && !aPressedLastFrame && combatMonsterEntity.Health > 0 {
+			combatMonsterEntity.TakeDamage(basicPunch.Damage)
+			playerTurn = false // fin du tour → passe au monstre
+		}
+		aPressedLastFrame = aPressed
 
-	// Attaque épée "E"
-	ePressed := ebiten.IsKeyPressed(ebiten.KeyE)
-	if ePressed && !ePressedLastFrame && combatMonsterEntity.Health > 0 {
-		combatMonsterEntity.TakeDamage(sword.Damage)
+		// Attaque épée "E" ou épée améliorée
+		ePressed := ebiten.IsKeyPressed(ebiten.KeyE)
+		if ePressed && !ePressedLastFrame && combatMonsterEntity.Health > 0 {
+			var hasSword, hasSwordPlus bool
+			if gameInstance != nil && gameInstance.player != nil {
+				for _, item := range gameInstance.player.Inventory {
+					if item == "Épée" {
+						hasSword = true
+					}
+					if item == "Épée améliorée" {
+						hasSwordPlus = true
+					}
+				}
+			}
+			if hasSwordPlus {
+				combatMonsterEntity.TakeDamage(50) // Dégâts épée améliorée
+				playerTurn = false
+			} else if hasSword {
+				combatMonsterEntity.TakeDamage(sword.Damage)
+				playerTurn = false
+			} else {
+				fmt.Println("Vous n'avez pas d'épée !")
+			}
+		}
+		ePressedLastFrame = ePressed
+
+		// Potion de shield "B"
+		bPressed := ebiten.IsKeyPressed(ebiten.KeyB)
+		if bPressed && !bPressedLastFrame {
+			if gameInstance != nil && gameInstance.player != nil {
+				gameInstance.player.Soigner(shieldPotion)
+			}
+			playerTurn = false
+		}
+		bPressedLastFrame = bPressed
+
+		// Potion de soin "V"
+		vPressed := ebiten.IsKeyPressed(ebiten.KeyV)
+		if vPressed && !vPressedLastFrame {
+			if gameInstance != nil && gameInstance.player != nil {
+				gameInstance.player.Soigner(healPotion)
+			}
+			playerTurn = false
+		}
+		vPressedLastFrame = vPressed
+
+	} else {
+		// --- Tour du monstre ---
+		if combatMonsterEntity.Health > 0 {
+			damage := 20 // valeur par défaut, à adapter si besoin
+			combatPlayerEntity.TakeDamage(damage)
+			fmt.Printf("%s attaque le joueur et inflige %d dégâts !\n", combatMonster.Name, damage)
+		}
+		playerTurn = true // fin du tour → revient au joueur
 	}
-	ePressedLastFrame = ePressed
 
 	// Fin combat si monstre mort
 	if combatMonsterEntity.Health <= 0 {
