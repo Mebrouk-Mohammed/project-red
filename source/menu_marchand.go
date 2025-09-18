@@ -11,48 +11,52 @@ import (
 )
 
 // MenuMarchand gère l'interface du marchand
+// MenuMarchand gère l'interface du marchand et les interactions d'achat
 type MenuMarchand struct {
-	player      *Personnage
-	open        bool
-	shopItems   []ShopItem
-	message     string
-	messageTime time.Time
+	player      *Personnage // Référence au joueur
+	open        bool        // Menu ouvert ou fermé
+	shopItems   []ShopItem // Liste des objets en vente
+	message     string     // Message temporaire
+	messageTime time.Time  // Temps d'affichage du message
 
-	shopZoneX        float64
-	shopZoneY        float64
-	shopZoneW        float64
-	shopZoneH        float64
-	lastMousePressed bool // Pour détecter le front du clic
+	shopZoneX        float64 // Position X du marchand
+	shopZoneY        float64 // Position Y du marchand
+	shopZoneW        float64 // Largeur de la zone du marchand
+	shopZoneH        float64 // Hauteur de la zone du marchand
+	lastMousePressed bool    // Pour détecter le front du clic
 }
 
 // ShopItem représente un objet à vendre
+// ShopItem représente un objet à vendre
 type ShopItem struct {
-	Name  string
-	Price int
+	Name  string // Nom de l'objet
+	Price int    // Prix de l'objet
 }
 
 // NewMenuMarchand initialise le marchand
+// Initialise le menu du marchand avec les objets disponibles
 func NewMenuMarchand(p *Personnage) *MenuMarchand {
-	items := []ShopItem{
-		{"Plante curative", 50},
-		{"Potion magique", 80},
-		{"Épée", 50},
-		{"Épée améliorée", 200},
-		{"Armure", 150},
-		{"Botte", 200},
-		{"Chapeau", 200},
-	}
-	return &MenuMarchand{
-		player:    p,
-		shopItems: items,
-		shopZoneX: 193, // coordonnées du marchand sur la map
-		shopZoneY: 9,
-		shopZoneW: 120, // largeur du sprite du marchand
-		shopZoneH: 120, // hauteur du sprite
-	}
+   items := []ShopItem{
+	   {"Plante curative", 50},
+	   {"Potion magique", 80},
+	   {"Épée", 50},
+	   {"Épée améliorée", 200},
+	   {"Armure", 150},
+	   {"Botte", 200},
+	   {"Chapeau", 200},
+   }
+   return &MenuMarchand{
+	   player:    p,
+	   shopItems: items,
+	   shopZoneX: 193, // coordonnées du marchand sur la map
+	   shopZoneY: 9,
+	   shopZoneW: 120, // largeur du sprite du marchand
+	   shopZoneH: 120, // hauteur du sprite
+   }
 }
 
 // Update gère l'ouverture automatique et les achats
+// Met à jour l'état du menu marchand et gère les achats
 func (m *MenuMarchand) Update() {
 	playerX := m.player.PosX
 	playerY := m.player.PosY

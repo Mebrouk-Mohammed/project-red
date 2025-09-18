@@ -10,6 +10,7 @@ import (
 )
 
 // ----------------- Structure Monstre -----------------
+// Monster représente un monstre sur la map
 type Monster struct {
 	Name       string          // Nom du monstre
 	X, Y       float64         // Position
@@ -22,13 +23,15 @@ type Monster struct {
 }
 
 // Liste des monstres
+// Liste des monstres présents sur la map
 var monsters []*Monster
-var combatMessage string // Message affiché si combat
-
-// Police par défaut intégrée
-var combatFont = basicfont.Face7x13 // pas besoin de fichier .ttf
+// Message affiché lors d'un combat
+var combatMessage string
+// Police par défaut pour les messages de combat
+var combatFont = basicfont.Face7x13
 
 // ----------------- Initialisation des monstres -----------------
+// Initialise les monstres sur la map
 func InitMonsters() {
 	serpent := &Monster{
 		Name:       "Serpent",
@@ -64,6 +67,7 @@ func InitMonsters() {
 }
 
 // ----------------- Mise à jour des monstres -----------------
+// Met à jour la position et l'état des monstres
 func UpdateMonsters() {
 	for _, m := range monsters {
 		// Déplacement
@@ -93,6 +97,7 @@ func UpdateMonsters() {
 }
 
 // ----------------- Dessin des monstres -----------------
+// Dessine les monstres à l'écran
 func DrawMonsters(screen *ebiten.Image) {
 	for _, m := range monsters {
 		if len(m.Sprites) > 0 {
@@ -104,6 +109,7 @@ func DrawMonsters(screen *ebiten.Image) {
 }
 
 // ----------------- Détection des collisions -----------------
+// Vérifie la collision entre le joueur et les monstres
 func checkCollisionWithPlayer() {
 	playerW, playerH := 64.0, 64.0 // taille approximative du joueur
 
@@ -128,6 +134,7 @@ func checkCollisionWithPlayer() {
 }
 
 // ----------------- Dessin de la fenêtre combat -----------------
+// Dessine le message de combat à l'écran
 func DrawCombatMessage(screen *ebiten.Image) {
 	if combatMessage == "" {
 		return

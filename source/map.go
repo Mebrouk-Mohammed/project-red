@@ -10,54 +10,57 @@ import (
 
 // Variable globale pour synchronisation avec le jeu principal
 
+// Variables globales pour la gestion de la map et du joueur
 var (
-	mapImage         *ebiten.Image
-	playerX, playerY float64 = 1240, 600
+	mapImage         *ebiten.Image // Image de la map
+	playerX, playerY float64 = 1240, 600 // Position initiale du joueur
 
-	playerSpeed float64 = 3
-	X, Y        float64
-	Zoom        float64
+	playerSpeed float64 = 3 // Vitesse du joueur
+	X, Y        float64     // Position de la caméra
+	Zoom        float64     // Zoom de la caméra
 
 	// Sprites par direction
-	upSprites    []*ebiten.Image
-	downSprites  []*ebiten.Image
-	leftSprites  []*ebiten.Image
-	rightSprites []*ebiten.Image
+	upSprites    []*ebiten.Image   // Sprites pour déplacement haut
+	downSprites  []*ebiten.Image   // Sprites pour déplacement bas
+	leftSprites  []*ebiten.Image   // Sprites pour déplacement gauche
+	rightSprites []*ebiten.Image   // Sprites pour déplacement droite
 
-	currentSprites []*ebiten.Image
-	index          int
-	lastUpdate     time.Time
+	currentSprites []*ebiten.Image // Sprites actuellement utilisés
+	index          int             // Index de l'animation
+	lastUpdate     time.Time       // Dernière mise à jour
 )
 
+// Charge et redimensionne une liste d'images
 func loadAndScale(paths []string, factor float64) []*ebiten.Image {
-	images := make([]*ebiten.Image, len(paths))
-	for i, path := range paths {
-		imgFile, _, err := ebitenutil.NewImageFromFile(path)
-		if err != nil {
-			log.Fatal(err)
-		}
+   images := make([]*ebiten.Image, len(paths))
+   for i, path := range paths {
+	   imgFile, _, err := ebitenutil.NewImageFromFile(path)
+	   if err != nil {
+		   log.Fatal(err)
+	   }
 
-		// Redimensionner l'image
-		w, h := imgFile.Size()
-		newImg := ebiten.NewImage(int(float64(w)*factor), int(float64(h)*factor))
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Scale(factor, factor)
-		newImg.DrawImage(imgFile, op)
+	   // Redimensionner l'image
+	   w, h := imgFile.Size()
+	   newImg := ebiten.NewImage(int(float64(w)*factor), int(float64(h)*factor))
+	   op := &ebiten.DrawImageOptions{}
+	   op.GeoM.Scale(factor, factor)
+	   newImg.DrawImage(imgFile, op)
 
-		images[i] = newImg
-	}
-	return images
+	   images[i] = newImg
+   }
+   return images
 }
 
 // Nouvelle fonction pour charger tous les sprites
+// Initialise tous les sprites du joueur
 func initSprites() {
-	upSprites = loadAndScale([]string{
-		"source/assets/perso/back-step1-.png",
-		"source/assets/perso/back-step2.png",
-		"source/assets/perso/back-fotor.png",
-	}, 0.25)
+   upSprites = loadAndScale([]string{
+	   "source/assets/perso/back-step1-.png",
+	   "source/assets/perso/back-step2.png",
+	   "source/assets/perso/back-fotor.png",
+   }, 0.25)
 
-	downSprites = loadAndScale([]string{
+   downSprites = loadAndScale([]string{
 		"source/assets/perso/fromt-step1.png",
 		"source/assets/perso/front-step2.png",
 		"source/assets/perso/front-step3.png",

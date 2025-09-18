@@ -44,20 +44,17 @@ func StartCombat(monster *Monster, playerImg *ebiten.Image) {
 		return
 	}
 
-	inCombat = true
-	combatMonster = monster
-	combatPlayerImage = playerImg
-	playerTurn = true
+	   // Démarre le combat entre le joueur et le monstre
+	   inCombat = true
+	   combatMonster = monster
+	   combatPlayerImage = playerImg
+	   playerTurn = true
 
-	// PV joueur
-	combatPlayerEntity = &Entity{Name: "Joueur", Health: 100}
+	   // Initialise l'entité joueur
+	   combatPlayerEntity = &Entity{Name: "Joueur", Health: 100}
 
-	// PV monstre selon type
-	var hp int
-	// Cette condition est toujours vraie, donc inutile
-	{
-		hp = monster.Health
-	}
+	   // Initialise l'entité monstre
+	   hp := monster.Health
 	combatMonsterEntity = &Entity{Name: monster.Name, Health: hp}
 }
 

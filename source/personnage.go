@@ -9,19 +9,19 @@ import (
 
 // Personnage représente le joueur
 type Personnage struct {
-	PosX   float64
-	PosY   float64
-	Width  float64
-	Height float64
+	PosX   float64 // Position X
+	PosY   float64 // Position Y
+	Width  float64 // Largeur du sprite
+	Height float64 // Hauteur du sprite
 
-	Name      string
-	Life      int
-	MaxLife   int
-	Shield    int
-	MaxShield int
-	Strength  int
-	Money     int
-	Inventory []string
+	Name      string   // Nom du joueur
+	Life      int      // Points de vie
+	MaxLife   int      // Points de vie max
+	Shield    int      // Points de bouclier
+	MaxShield int      // Bouclier max
+	Strength  int      // Force
+	Money     int      // Argent
+	Inventory []string // Inventaire
 }
 
 // AjouterItem ajoute un item à l’inventaire et applique ses effets
