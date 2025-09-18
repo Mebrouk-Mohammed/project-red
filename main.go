@@ -1,6 +1,3 @@
-// Pour lancer le jeu correctement, utilisez :
-// go run .
-// et non 'go run main.go'
 package main
 
 
