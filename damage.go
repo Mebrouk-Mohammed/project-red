@@ -4,6 +4,7 @@ package main
 type Entity struct {
 	Name   string
 	Health int
+	Damage int
 }
 
 // ----------------- Structure d'une arme -----------------

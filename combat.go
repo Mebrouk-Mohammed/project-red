@@ -21,6 +21,7 @@ var combatMonsterEntity *Entity
 
 var basicPunch = Weapon{Name: "Coup de poing", Damage: 10}
 var sword = Weapon{Name: "Épée", Damage: 25}
+
 // Message temporaire combat
 var combatTempMessage string
 var combatTempMsgTime time.Time
@@ -52,14 +53,9 @@ func StartCombat(monster *Monster, playerImg *ebiten.Image) {
 	combatPlayerEntity = &Entity{Name: "Joueur", Health: 100}
 
 	// PV monstre selon type
-	hp := 50
-	switch monster.Name {
-	case "Serpent":
-		hp = 100
-	case "Scorpion":
-		hp = 50
-	case "Hyene":
-		hp = 200
+	var hp int
+	if monster != nil {
+		hp = monster.Health
 	}
 	combatMonsterEntity = &Entity{Name: monster.Name, Health: hp}
 }
@@ -90,6 +86,12 @@ func UpdateCombat() {
 	}
 	spacePressedLastFrame = spacePressed
 
+	// Si le joueur n'a plus de vie ni de shield, impossible d'attaquer
+	if gameInstance != nil && gameInstance.player != nil && gameInstance.player.Life == 0 && gameInstance.player.Shield == 0 {
+		combatTempMessage = "Vous avez perdu. Impossible d'envoyer une attaque. Essayez une prochaine fois."
+		combatTempMsgTime = time.Now()
+		return
+	}
 	if playerTurn {
 		// Attaque simple "A"
 		aPressed := ebiten.IsKeyPressed(ebiten.KeyA)
@@ -178,6 +180,23 @@ func UpdateCombat() {
 
 	// Fin combat si monstre mort
 	if combatMonsterEntity.Health <= 0 {
+		// Récompense selon le monstre vaincu
+		if gameInstance != nil && gameInstance.player != nil && combatMonster != nil {
+			switch combatMonster.Name {
+			case "Scorpion":
+				gameInstance.player.Money += 50
+				combatTempMessage = "Bravo ! Vous avez gagné 50 pièces."
+				combatTempMsgTime = time.Now()
+			case "Serpent":
+				gameInstance.player.Money += 100
+				combatTempMessage = "Bravo ! Vous avez gagné 100 pièces."
+				combatTempMsgTime = time.Now()
+			case "Hyène":
+				gameInstance.player.Money += 200
+				combatTempMessage = "Bravo ! Vous avez gagné 200 pièces."
+				combatTempMsgTime = time.Now()
+			}
+		}
 		RemoveMonsterFromMap(combatMonster)
 		EndCombat()
 	}
@@ -209,6 +228,10 @@ func DrawCombatScreen(screen *ebiten.Image) {
 		// Message temporaire dégâts
 		if combatTempMessage != "" && time.Since(combatTempMsgTime).Seconds() < 2 {
 			text.Draw(screen, combatTempMessage, combatFonts, x+20, y+140, color.RGBA{255, 0, 0, 255})
+		}
+		// Message de défaite
+		if gameInstance.player.Life == 0 {
+			text.Draw(screen, "Vous avez perdu, essayez une prochaine fois !", combatFonts, x+winW/2-200, y+winH/2, color.RGBA{255, 0, 0, 255})
 		}
 	}
 	text.Draw(screen, "PV "+combatMonsterEntity.Name+": "+itoa(combatMonsterEntity.Health), combatFonts, x+20, y+120, color.RGBA{255, 0, 0, 255})

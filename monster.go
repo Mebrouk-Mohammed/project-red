@@ -18,6 +18,7 @@ type Monster struct {
 	LastUpdate time.Time       // Dernière mise à jour animation
 	Speed      float64         // Vitesse du monstre
 	DirX, DirY float64         // Direction du mouvement
+	Health     int             // Points de vie du monstre
 }
 
 // Liste des monstres
@@ -36,6 +37,7 @@ func InitMonsters() {
 		Sprites:    loadAndScale([]string{"assets/serpent1.png"}, 0.07),
 		Speed:      1.5,
 		LastUpdate: time.Now(),
+		Health:     200,
 	}
 
 	scorpion := &Monster{
@@ -45,6 +47,7 @@ func InitMonsters() {
 		Sprites:    loadAndScale([]string{"assets/scorpion1.png"}, 0.20),
 		Speed:      2,
 		LastUpdate: time.Now(),
+		Health:     100,
 	}
 
 	hyene := &Monster{
@@ -54,6 +57,7 @@ func InitMonsters() {
 		Sprites:    loadAndScale([]string{"assets/hyene1.png"}, 0.20),
 		Speed:      1,
 		LastUpdate: time.Now(),
+		Health:     400,
 	}
 
 	monsters = []*Monster{serpent, scorpion, hyene}

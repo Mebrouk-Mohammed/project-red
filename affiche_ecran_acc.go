@@ -12,8 +12,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/audio/mp3"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/hajimehoshi/ebiten/v2/text"
-	"golang.org/x/image/font/basicfont"
 )
 
 var (
@@ -50,8 +48,8 @@ func NewGame() *Game {
 		Shield:    0,
 		MaxShield: 100, // valeur de base
 		Strength:  10,
-		Money:     10000,
-		Inventory: []string{"Épée", "Potion"},
+		Money:     100,
+		Inventory: []string{},
 	}
 
 	g := &Game{
@@ -230,13 +228,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		DrawCombatScreen(screen)
 		g.inventaire.Draw(screen)
 
-	}
-	// Affichage DEBUG des coordonnées du joueur et du marchand au centre de l'écran
-	if g.player != nil && g.marchand != nil {
-		debugStr := fmt.Sprintf("Joueur: X=%.0f Y=%.0f W=%.0f H=%.0f\nMarchand: X=%.0f Y=%.0f W=%.0f H=%.0f", g.player.PosX, g.player.PosY, g.player.Width, g.player.Height, g.marchand.shopZoneX, g.marchand.shopZoneY, g.marchand.shopZoneW, g.marchand.shopZoneH)
-		face := basicfont.Face7x13
-		w, h := screen.Size()
-		text.Draw(screen, debugStr, face, w/2-120, h/2-20, color.RGBA{255, 0, 0, 255})
 	}
 
 }
