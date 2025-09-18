@@ -1,4 +1,4 @@
-package main
+package source
 
 import (
 	"image/color"
@@ -34,7 +34,7 @@ func InitMonsters() {
 		Name:       "Serpent",
 		X:          1300,
 		Y:          75,
-		Sprites:    loadAndScale([]string{"assets/serpent1.png"}, 0.07),
+		Sprites:    loadAndScale([]string{"source/assets/serpent1.png"}, 0.07),
 		Speed:      1.5,
 		LastUpdate: time.Now(),
 		Health:     200,
@@ -44,7 +44,7 @@ func InitMonsters() {
 		Name:       "Scorpion",
 		X:          220,
 		Y:          350,
-		Sprites:    loadAndScale([]string{"assets/scorpion1.png"}, 0.20),
+		Sprites:    loadAndScale([]string{"source/assets/scorpion1.png"}, 0.20),
 		Speed:      2,
 		LastUpdate: time.Now(),
 		Health:     100,
@@ -54,7 +54,7 @@ func InitMonsters() {
 		Name:       "Hyène",
 		X:          350,
 		Y:          650,
-		Sprites:    loadAndScale([]string{"assets/hyene1.png"}, 0.20),
+		Sprites:    loadAndScale([]string{"source/assets/hyene1.png"}, 0.20),
 		Speed:      1,
 		LastUpdate: time.Now(),
 		Health:     400,

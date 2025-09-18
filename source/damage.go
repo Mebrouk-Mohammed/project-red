@@ -1,4 +1,4 @@
-package main
+package source
 
 // ----------------- Structure d'une entité (joueur ou monstre) -----------------
 type Entity struct {

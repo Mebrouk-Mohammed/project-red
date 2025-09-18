@@ -1,4 +1,4 @@
-package main
+package source
 
 import (
 	"fmt"
@@ -18,11 +18,11 @@ type MenuMarchand struct {
 	message     string
 	messageTime time.Time
 
-	shopZoneX float64
-	shopZoneY float64
-	shopZoneW float64
-	shopZoneH float64
-	 lastMousePressed bool // Pour détecter le front du clic
+	shopZoneX        float64
+	shopZoneY        float64
+	shopZoneW        float64
+	shopZoneH        float64
+	lastMousePressed bool // Pour détecter le front du clic
 }
 
 // ShopItem représente un objet à vendre
@@ -73,41 +73,41 @@ func (m *MenuMarchand) Update() {
 		return
 	}
 
- // Achat sur front du clic gauche
- mousePressed := ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft)
- if mousePressed && !m.lastMousePressed {
- 	mx, my := ebiten.CursorPosition()
- 	colSize := 5
- 	cellW, cellH := 110, 50
- 	screenW, screenH := ebiten.ScreenSizeInFullscreen()
- 	width, height := screenW*3/5, screenH*2/5
- 	x := (screenW - width) / 2
- 	y := (screenH - height) / 2
- 	startX := x + 20
- 	startY := y + 90
+	// Achat sur front du clic gauche
+	mousePressed := ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft)
+	if mousePressed && !m.lastMousePressed {
+		mx, my := ebiten.CursorPosition()
+		colSize := 5
+		cellW, cellH := 110, 50
+		screenW, screenH := ebiten.ScreenSizeInFullscreen()
+		width, height := screenW*3/5, screenH*2/5
+		x := (screenW - width) / 2
+		y := (screenH - height) / 2
+		startX := x + 20
+		startY := y + 90
 
- 	for i, item := range m.shopItems {
- 		col := i % colSize
- 		row := i / colSize
- 		itemX := startX + col*cellW
- 		itemY := startY + row*cellH
+		for i, item := range m.shopItems {
+			col := i % colSize
+			row := i / colSize
+			itemX := startX + col*cellW
+			itemY := startY + row*cellH
 
- 		if float64(mx) >= float64(itemX) && float64(mx) <= float64(itemX+cellW-10) &&
- 			float64(my) >= float64(itemY) && float64(my) <= float64(itemY+cellH-10) {
+			if float64(mx) >= float64(itemX) && float64(mx) <= float64(itemX+cellW-10) &&
+				float64(my) >= float64(itemY) && float64(my) <= float64(itemY+cellH-10) {
 
- 			if m.player.Money >= item.Price {
- 				m.player.Money -= item.Price
- 				m.player.AjouterItem(item.Name) // applique effets automatiquement
- 				m.message = fmt.Sprintf("Vous avez acheté %s pour %d pièces !", item.Name, item.Price)
- 				m.messageTime = time.Now()
- 			} else {
- 				m.message = "Pas assez d'or !"
- 				m.messageTime = time.Now()
- 			}
- 		}
- 	}
- }
- m.lastMousePressed = mousePressed
+				if m.player.Money >= item.Price {
+					m.player.Money -= item.Price
+					m.player.AjouterItem(item.Name) // applique effets automatiquement
+					m.message = fmt.Sprintf("Vous avez acheté %s pour %d pièces !", item.Name, item.Price)
+					m.messageTime = time.Now()
+				} else {
+					m.message = "Pas assez d'or !"
+					m.messageTime = time.Now()
+				}
+			}
+		}
+	}
+	m.lastMousePressed = mousePressed
 }
 
 // Draw affiche le menu marchand

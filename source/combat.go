@@ -1,4 +1,4 @@
-package main
+package source
 
 import (
 	"fmt"
@@ -54,7 +54,8 @@ func StartCombat(monster *Monster, playerImg *ebiten.Image) {
 
 	// PV monstre selon type
 	var hp int
-	if monster != nil {
+	// Cette condition est toujours vraie, donc inutile
+	{
 		hp = monster.Health
 	}
 	combatMonsterEntity = &Entity{Name: monster.Name, Health: hp}
@@ -165,7 +166,7 @@ func UpdateCombat() {
 				} else if lostLife > 0 {
 					combatTempMessage = fmt.Sprintf("Le monstre inflige %d dégâts ! Vie -%d", damage, lostLife)
 				} else {
-					combatTempMessage = fmt.Sprintf("Le monstre attaque !")
+					combatTempMessage = "Le monstre attaque !"
 				}
 				combatTempMsgTime = time.Now()
 			} else {

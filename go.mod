@@ -1,4 +1,5 @@
-module sahara_defender
+replace project-red-1/source => ./source
+module project-red-1
 
 go 1.25.0
 

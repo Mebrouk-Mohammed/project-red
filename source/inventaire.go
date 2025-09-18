@@ -1,4 +1,4 @@
-package main
+package source
 
 import (
 	"fmt"
@@ -56,25 +56,25 @@ func (inv *InventaireGUI) Update() {
 			if float64(mx) >= float64(itemX) && float64(mx) <= float64(itemX+cellW-10) &&
 				float64(my) >= float64(itemY) && float64(my) <= float64(itemY+cellH-10) {
 
-				   switch item {
-				   case "Plante curative":
-					   inv.player.Soigner(50)
-					   inv.message = fmt.Sprintf("%s utilise %s ! Vie: %d/%d", inv.player.Name, item, inv.player.Life, inv.player.MaxLife)
-				   case "Potion magique":
-					   inv.player.AjouterShield(10)
-					   inv.message = fmt.Sprintf("%s utilise %s ! Shield: %d/%d", inv.player.Name, item, inv.player.Shield, inv.player.MaxShield)
-				   case "Armure":
-					   inv.player.MaxShield += 30
-					   inv.message = fmt.Sprintf("%s utilise %s ! MaxShield: %d", inv.player.Name, item, inv.player.MaxShield)
-				   case "Botte":
-					   inv.player.MaxShield += 20
-					   inv.message = fmt.Sprintf("%s utilise %s ! MaxShield: %d", inv.player.Name, item, inv.player.MaxShield)
-				   case "Chapeau":
-					   inv.player.MaxShield += 10
-					   inv.message = fmt.Sprintf("%s utilise %s ! MaxShield: %d", inv.player.Name, item, inv.player.MaxShield)
-				   default:
-					   inv.message = fmt.Sprintf("%s ne peut pas utiliser %s", inv.player.Name, item)
-				   }
+				switch item {
+				case "Plante curative":
+					inv.player.Soigner(50)
+					inv.message = fmt.Sprintf("%s utilise %s ! Vie: %d/%d", inv.player.Name, item, inv.player.Life, inv.player.MaxLife)
+				case "Potion magique":
+					inv.player.AjouterShield(10)
+					inv.message = fmt.Sprintf("%s utilise %s ! Shield: %d/%d", inv.player.Name, item, inv.player.Shield, inv.player.MaxShield)
+				case "Armure":
+					inv.player.MaxShield += 30
+					inv.message = fmt.Sprintf("%s utilise %s ! MaxShield: %d", inv.player.Name, item, inv.player.MaxShield)
+				case "Botte":
+					inv.player.MaxShield += 20
+					inv.message = fmt.Sprintf("%s utilise %s ! MaxShield: %d", inv.player.Name, item, inv.player.MaxShield)
+				case "Chapeau":
+					inv.player.MaxShield += 10
+					inv.message = fmt.Sprintf("%s utilise %s ! MaxShield: %d", inv.player.Name, item, inv.player.MaxShield)
+				default:
+					inv.message = fmt.Sprintf("%s ne peut pas utiliser %s", inv.player.Name, item)
+				}
 
 				// Retirer l'item après usage
 				inv.player.Inventory = append(inv.player.Inventory[:i], inv.player.Inventory[i+1:]...)
