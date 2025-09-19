@@ -12,11 +12,12 @@ import (
 
 // InventaireGUI gère l'affichage et la logique de l'inventaire du joueur
 type InventaireGUI struct {
-	player   *Personnage // Référence au joueur
-	open     bool        // Inventaire ouvert ou fermé
-	keyPrevP bool        // État précédent de la touche P
-	message  string      // Message temporaire affiché
-	msgTime  time.Time   // Temps d'affichage du message
+	player           *Personnage // Référence au joueur
+	open             bool        // Inventaire ouvert ou fermé
+	keyPrevP         bool        // État précédent de la touche P
+	keyPrevMouseLeft bool        // État précédent du clic gauche
+	message          string      // Message temporaire affiché
+	msgTime          time.Time   // Temps d'affichage du message
 }
 
 // Crée une nouvelle interface d'inventaire pour le joueur
@@ -39,8 +40,9 @@ func (inv *InventaireGUI) Update() {
 		return
 	}
 
-	// Gestion du clic sur les items
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+	// Gestion du clic sur les items (front du clic gauche)
+	mouseLeft := ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft)
+	if mouseLeft && !inv.keyPrevMouseLeft {
 		mx, my := ebiten.CursorPosition()
 		colSize := 5
 		cellW, cellH := 110, 50
@@ -88,6 +90,7 @@ func (inv *InventaireGUI) Update() {
 			}
 		}
 	}
+	inv.keyPrevMouseLeft = mouseLeft
 }
 
 // Dessine l'inventaire à l'écran
