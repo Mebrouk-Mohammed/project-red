@@ -50,7 +50,7 @@ func NewGame() *Game {
 		Shield:    0,
 		MaxShield: 100, // valeur de base
 		Strength:  10,
-		Money:     10000,
+		Money:     100,
 		Inventory: []string{},
 	}
 
