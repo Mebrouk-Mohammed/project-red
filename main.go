@@ -1,8 +1,7 @@
 package main
 
-
-import "project-red-1/source"
+import source "project-red-1/src"
 
 func main() {
-    source.Main()
+	source.Main()
 }

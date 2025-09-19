@@ -55,26 +55,26 @@ func loadAndScale(paths []string, factor float64) []*ebiten.Image {
 // Initialise tous les sprites du joueur
 func initSprites() {
 	upSprites = loadAndScale([]string{
-		"source/assets/perso/back-step1-.png",
-		"source/assets/perso/back-step2.png",
-		"source/assets/perso/back-fotor.png",
+		"src/assets/perso/back-step1-.png",
+		"src/assets/perso/back-step2.png",
+		"src/assets/perso/back-fotor.png",
 	}, 0.25)
 
 	downSprites = loadAndScale([]string{
-		"source/assets/perso/fromt-step1.png",
-		"source/assets/perso/front-step2.png",
-		"source/assets/perso/front-step3.png",
+		"src/assets/perso/fromt-step1.png",
+		"src/assets/perso/front-step2.png",
+		"src/assets/perso/front-step3.png",
 	}, 0.25)
 
 	leftSprites = loadAndScale([]string{
-		"source/assets/perso/left-step1.png",
-		"source/assets/perso/left-step1z.png",
-		"source/assets/perso/left-step3.png",
+		"src/assets/perso/left-step1.png",
+		"src/assets/perso/left-step1z.png",
+		"src/assets/perso/left-step3.png",
 	}, 0.25)
 
 	rightSprites = loadAndScale([]string{
-		"source/assets/perso/right-step1-.png",
-		"source/assets/perso/right-step3.png",
+		"src/assets/perso/right-step1-.png",
+		"src/assets/perso/right-step3.png",
 	}, 0.25)
 
 	// Par défaut, face vers le bas
@@ -84,7 +84,7 @@ func initSprites() {
 
 func LoadMap() {
 	// Charger la map
-	img, _, err := ebitenutil.NewImageFromFile("source/assets/mapz.png")
+	img, _, err := ebitenutil.NewImageFromFile("src/assets/mapz.png")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -92,27 +92,27 @@ func LoadMap() {
 
 	// Charger les sprites par direction
 	upSprites = loadAndScale([]string{
-		"source/assets/perso/back-step1-.png",
-		"source/assets/perso/back-step2.png",
-		"source/assets/perso/back-fotor.png",
+		"src/assets/perso/back-step1-.png",
+		"src/assets/perso/back-step2.png",
+		"src/assets/perso/back-fotor.png",
 	}, 0.25)
 
 	downSprites = loadAndScale([]string{
-		"source/assets/perso/fromt-step1.png",
-		"source/assets/perso/front-step2.png",
-		"source/assets/perso/front-step3.png",
+		"src/assets/perso/fromt-step1.png",
+		"src/assets/perso/front-step2.png",
+		"src/assets/perso/front-step3.png",
 	}, 0.25)
 
 	leftSprites = loadAndScale([]string{
-		"source/assets/perso/left-step4.png",
-		"source/assets/perso/left-step5.png",
-		"source/assets/perso/left-step1.png",
+		"src/assets/perso/left-step4.png",
+		"src/assets/perso/left-step5.png",
+		"src/assets/perso/left-step1.png",
 	}, 0.25)
 
 	rightSprites = loadAndScale([]string{
-		"source/assets/perso/right-step1-.png",
-		"source/assets/perso/right-step3.png",
-		"source/assets/perso/right-step4.png",
+		"src/assets/perso/right-step1-.png",
+		"src/assets/perso/right-step3.png",
+		"src/assets/perso/right-step4.png",
 	}, 0.25)
 
 }

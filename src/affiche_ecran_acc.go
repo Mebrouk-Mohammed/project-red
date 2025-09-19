@@ -73,7 +73,7 @@ func NewGame() *Game {
 	// Chargement des frames vidéo
 	totalFrames := 150
 	for i := 1; i <= totalFrames; i++ {
-		path := fmt.Sprintf("source/assets/video_frames/frame%03d.png", i)
+		path := fmt.Sprintf("src/assets/video_frames/frame%03d.png", i)
 		img, _, err := ebitenutil.NewImageFromFile(path)
 		if err != nil {
 			log.Println("Impossible de charger l'image :", path, err)
@@ -91,7 +91,7 @@ func NewGame() *Game {
 func playMusic() {
 	audioCtx = audio.NewContext(44100)
 
-	data, err := os.ReadFile("source/assets/menu.mp3") // <-- mets ton mp3 ici
+	data, err := os.ReadFile("src/assets/menu.mp3") // <-- mets ton mp3 ici
 	if err != nil {
 		log.Fatal(err)
 	}

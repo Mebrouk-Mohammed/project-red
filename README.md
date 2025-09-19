@@ -1,7 +1,33 @@
-Ce projet est un petit jeu RPG développé en **Go** avec la bibliothèque **Ebiten**.  
-Le joueur affronte différents monstres (serpent, scorpion, hyène) au tour par tour.  
-Chaque monstre possède ses propres points de vie et dégâts, et le joueur doit survivre en gérant ses attaques. 
 
-Il faut installer GO (sa dernière version) et Ebiten (via la commande "go get")
+# Sahara Defender
 
-pour lancer le jeux il faut entrer la commande "run main.go" dans le terminal, le jeu démarre et ouvre une feunêtre ou l'on peut commencer à jouer.
+Ce projet est un jeu RPG développé en **Go** avec la bibliothèque **Ebiten**.
+Le joueur incarne un aventurier devant survivre dans le désert en affrontant différents monstres : serpent, scorpion, hyène, etc.
+Chaque monstre possède ses propres points de vie et dégâts. Le joueur doit gérer ses attaques, son inventaire et ses choix stratégiques pour survivre.
+
+## Installation
+
+1. Installez la dernière version de **Go** : [https://go.dev/dl/](https://go.dev/dl/)
+2. Installez la bibliothèque Ebiten :
+	```sh
+	go get github.com/hajimehoshi/ebiten/v2
+	```
+
+## Lancement du jeu
+
+Dans le terminal, exécutez :
+```sh
+go run main.go
+```
+Le jeu démarre et une fenêtre s’ouvre pour commencer à jouer.
+
+## Conseils
+
+- Les choix chez le marchand influencent vos combats et votre progression.
+- Gérez bien votre inventaire et vos ressources pour survivre face aux monstres.
+- Explorez la carte et découvrez tous les secrets du désert !
+
+## Ressources
+
+- [Documentation Ebiten](https://ebiten.org/documents/overview.html)
+- [Go Language](https://golang.org/)
