@@ -44,6 +44,7 @@ func InitMonsters() {
 		Speed:      1.5,
 		LastUpdate: time.Now(),
 		Health:     200,
+		Damage:     15,
 	}
 
 	scorpion := &Monster{
@@ -54,6 +55,7 @@ func InitMonsters() {
 		Speed:      2,
 		LastUpdate: time.Now(),
 		Health:     100,
+		Damage:     5,
 	}
 
 	hyene := &Monster{
@@ -64,6 +66,7 @@ func InitMonsters() {
 		Speed:      1,
 		LastUpdate: time.Now(),
 		Health:     400,
+		Damage:     25,
 	}
 
 	monsters = []*Monster{serpent, scorpion, hyene}

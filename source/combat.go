@@ -55,7 +55,7 @@ func StartCombat(monster *Monster, playerImg *ebiten.Image) {
 
 	// Initialise l'entité monstre
 	hp := monster.Health
-	combatMonsterEntity = &Entity{Name: monster.Name, Health: hp, Damage: 20}
+	combatMonsterEntity = &Entity{Name: monster.Name, Health: hp, Damage: monster.Damage}
 }
 
 // ----------------- Fin du combat -----------------
