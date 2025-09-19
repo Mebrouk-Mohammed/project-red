@@ -92,7 +92,7 @@ func UpdateCombat() {
 	}
 	if playerTurn {
 		// Attaque simple "A"
-		aPressed := ebiten.IsKeyPressed(ebiten.KeyA)
+		aPressed := ebiten.IsKeyPressed(ebiten.KeyQ)
 		if aPressed && !aPressedLastFrame && combatMonsterEntity.Health > 0 {
 			combatMonsterEntity.TakeDamage(basicPunch.Damage)
 			playerTurn = false // fin du tour → passe au monstre
@@ -186,11 +186,11 @@ func UpdateCombat() {
 				combatTempMessage = "Bravo ! Vous avez gagné 50 pièces."
 				combatTempMsgTime = time.Now()
 			case "Serpent":
-				gameInstance.player.Money += 100
+				gameInstance.player.Money += 500
 				combatTempMessage = "Bravo ! Vous avez gagné 100 pièces."
 				combatTempMsgTime = time.Now()
 			case "Hyène":
-				gameInstance.player.Money += 200
+				gameInstance.player.Money += 1000
 				combatTempMessage = "Bravo ! Vous avez gagné 200 pièces."
 				combatTempMsgTime = time.Now()
 			}
@@ -250,7 +250,7 @@ func DrawCombatScreen(screen *ebiten.Image) {
 	}
 
 	// Instructions
-	text.Draw(screen, "A = Attaque simple | E = Épée | SPACE = Fuir", combatFonts, x+20, y+winH-30, color.Black)
+	text.Draw(screen, "A = Coup de point ! | E = Épée ! | SPACE = Fuir !", combatFonts, x+20, y+winH-30, color.Black)
 }
 
 // ----------------- Collision pour lancer combat -----------------
