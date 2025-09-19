@@ -20,7 +20,7 @@ var combatPlayerEntity *Entity
 var combatMonsterEntity *Entity
 
 var basicPunch = Weapon{Name: "Coup de poing", Damage: 10}
-var sword = Weapon{Name: "Épée", Damage: 25}
+var sword = Weapon{Name: "Épée", Damage: 40}
 
 // Message temporaire combat
 var combatTempMessage string
@@ -114,7 +114,7 @@ func UpdateCombat() {
 				}
 			}
 			if hasSwordPlus {
-				combatMonsterEntity.TakeDamage(50) // Dégâts épée améliorée
+				combatMonsterEntity.TakeDamage(75) // Dégâts épée améliorée
 				playerTurn = false
 			} else if hasSword {
 				combatMonsterEntity.TakeDamage(sword.Damage)
