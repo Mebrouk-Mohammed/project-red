@@ -25,8 +25,10 @@ type Monster struct {
 // Liste des monstres
 // Liste des monstres présents sur la map
 var monsters []*Monster
+
 // Message affiché lors d'un combat
 var combatMessage string
+
 // Police par défaut pour les messages de combat
 var combatFont = basicfont.Face7x13
 

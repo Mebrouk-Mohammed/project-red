@@ -15,9 +15,9 @@ import (
 type MenuMarchand struct {
 	player      *Personnage // Référence au joueur
 	open        bool        // Menu ouvert ou fermé
-	shopItems   []ShopItem // Liste des objets en vente
-	message     string     // Message temporaire
-	messageTime time.Time  // Temps d'affichage du message
+	shopItems   []ShopItem  // Liste des objets en vente
+	message     string      // Message temporaire
+	messageTime time.Time   // Temps d'affichage du message
 
 	shopZoneX        float64 // Position X du marchand
 	shopZoneY        float64 // Position Y du marchand
@@ -36,23 +36,23 @@ type ShopItem struct {
 // NewMenuMarchand initialise le marchand
 // Initialise le menu du marchand avec les objets disponibles
 func NewMenuMarchand(p *Personnage) *MenuMarchand {
-   items := []ShopItem{
-	   {"Plante curative", 50},
-	   {"Potion magique", 80},
-	   {"Épée", 50},
-	   {"Épée améliorée", 200},
-	   {"Armure", 150},
-	   {"Botte", 200},
-	   {"Chapeau", 200},
-   }
-   return &MenuMarchand{
-	   player:    p,
-	   shopItems: items,
-	   shopZoneX: 193, // coordonnées du marchand sur la map
-	   shopZoneY: 9,
-	   shopZoneW: 120, // largeur du sprite du marchand
-	   shopZoneH: 120, // hauteur du sprite
-   }
+	items := []ShopItem{
+		{"Plante curative", 50},
+		{"Potion magique", 80},
+		{"Épée", 50},
+		{"Épée améliorée", 200},
+		{"Armure", 150},
+		{"Botte", 200},
+		{"Chapeau", 200},
+	}
+	return &MenuMarchand{
+		player:    p,
+		shopItems: items,
+		shopZoneX: 193, // coordonnées du marchand sur la map
+		shopZoneY: 9,
+		shopZoneW: 120, // largeur du sprite du marchand
+		shopZoneH: 120, // hauteur du sprite
+	}
 }
 
 // Update gère l'ouverture automatique et les achats

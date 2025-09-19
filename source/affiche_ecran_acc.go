@@ -34,6 +34,7 @@ type Game struct {
 
 	camera Camera
 }
+
 // Camera gère la position et le zoom de la vue
 type Camera struct {
 	X, Y float64 // Position de la caméra
@@ -111,148 +112,148 @@ func playMusic() {
 
 // Update gère la logique du jeu
 func (g *Game) Update() error {
-	   // Gestion du combat
-	   if inCombat {
-		   UpdateCombat()
-		   return nil
-	   }
+	// Gestion du combat
+	if inCombat {
+		UpdateCombat()
+		return nil
+	}
 
-	   // Gestion des entrées clavier/souris
-	   if ebiten.IsKeyPressed(ebiten.KeyEscape) {
-		   return ebiten.Termination
-	   }
+	// Gestion des entrées clavier/souris
+	if ebiten.IsKeyPressed(ebiten.KeyEscape) {
+		return ebiten.Termination
+	}
 
-	   if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && g.inMenu {
-		   x, y := ebiten.CursorPosition()
-		   // Bouton Start
-		   if x >= 90 && x <= 210 && y >= 520 && y <= 640 {
-			   fmt.Println("🎮 Start New Game !")
-			   g.inMenu = false
-		   }
-		   // Bouton Quitter
-		   if x >= 240 && x <= 360 && y >= 520 && y <= 640 {
-			   fmt.Println("👋 Quitter le jeu...")
-			   os.Exit(0)
-		   }
-	   }
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && g.inMenu {
+		x, y := ebiten.CursorPosition()
+		// Bouton Start
+		if x >= 90 && x <= 210 && y >= 520 && y <= 640 {
+			fmt.Println("🎮 Start New Game !")
+			g.inMenu = false
+		}
+		// Bouton Quitter
+		if x >= 240 && x <= 360 && y >= 520 && y <= 640 {
+			fmt.Println("👋 Quitter le jeu...")
+			os.Exit(0)
+		}
+	}
 
-	   // Mise à jour du joueur si hors menu
-	   if !g.inMenu {
-		   UpdatePlayer()
-	   }
+	// Mise à jour du joueur si hors menu
+	if !g.inMenu {
+		UpdatePlayer()
+	}
 
-	   // Animation vidéo menu
-	   if g.inMenu && !g.videoEnded {
-		   now := time.Now()
-		   if now.Sub(g.lastFrameTime) >= g.frameDelay {
-			   g.index++
-			   if g.index >= len(g.frames) {
-				   g.index = len(g.frames) - 1
-				   g.videoEnded = true
-			   }
-			   g.lastFrameTime = now
-		   }
-	   }
+	// Animation vidéo menu
+	if g.inMenu && !g.videoEnded {
+		now := time.Now()
+		if now.Sub(g.lastFrameTime) >= g.frameDelay {
+			g.index++
+			if g.index >= len(g.frames) {
+				g.index = len(g.frames) - 1
+				g.videoEnded = true
+			}
+			g.lastFrameTime = now
+		}
+	}
 
-	   // Gestion du zoom
-	   switch {
-	   case ebiten.IsKeyPressed(ebiten.KeyKPAdd), ebiten.IsKeyPressed(ebiten.KeyEqual):
-		   g.camera.Zoom += 0.01
-	   case ebiten.IsKeyPressed(ebiten.KeyKPSubtract), ebiten.IsKeyPressed(ebiten.KeyMinus):
-		   if g.camera.Zoom > 0.2 {
-			   g.camera.Zoom -= 0.01
-		   }
-	   }
+	// Gestion du zoom
+	switch {
+	case ebiten.IsKeyPressed(ebiten.KeyKPAdd), ebiten.IsKeyPressed(ebiten.KeyEqual):
+		g.camera.Zoom += 0.01
+	case ebiten.IsKeyPressed(ebiten.KeyKPSubtract), ebiten.IsKeyPressed(ebiten.KeyMinus):
+		if g.camera.Zoom > 0.2 {
+			g.camera.Zoom -= 0.01
+		}
+	}
 
-	   // Déplacement caméra
-	   if ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
-		   g.camera.Y -= 5
-	   }
-	   if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
-		   g.camera.Y += 5
-	   }
-	   if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
-		   g.camera.X -= 5
-	   }
-	   if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
-		   g.camera.X += 5
-	   }
+	// Déplacement caméra
+	if ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
+		g.camera.Y -= 5
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
+		g.camera.Y += 5
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
+		g.camera.X -= 5
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
+		g.camera.X += 5
+	}
 
-	   // Mise à jour des entités
-	   UpdateMonsters()
-	   CheckCollisionWithPlayerCombat()
-	   if g.inventaire != nil {
-		   g.inventaire.Update()
-	   }
-	   if g.marchand != nil {
-		   g.marchand.Update()
-	   }
+	// Mise à jour des entités
+	UpdateMonsters()
+	CheckCollisionWithPlayerCombat()
+	if g.inventaire != nil {
+		g.inventaire.Update()
+	}
+	if g.marchand != nil {
+		g.marchand.Update()
+	}
 
-	   return nil
+	return nil
 }
 
 // Draw affiche le menu ou la map
 func (g *Game) Draw(screen *ebiten.Image) {
-	   if g.inMenu {
-		   // Affichage du menu vidéo
-		   if len(g.frames) > 0 && g.index < len(g.frames) {
-			   opts := &ebiten.DrawImageOptions{}
-			   opts.GeoM.Scale(
-				   float64(screen.Bounds().Dx())/float64(g.frames[g.index].Bounds().Dx()),
-				   float64(screen.Bounds().Dy())/float64(g.frames[g.index].Bounds().Dy()),
-			   )
-			   screen.DrawImage(g.frames[g.index], opts)
-		   } else {
-			   screen.Fill(color.Black)
-		   }
-		   if !g.videoEnded {
-			   ebitenutil.DebugPrint(screen, "SAHARA DEFENDER\nVidéo en cours...")
-		   } else {
-			   ebitenutil.DebugPrint(screen, "SAHARA DEFENDER\nFin de la vidéo.\nClique Start ou Leave")
-		   }
-		   if inCombat {
-			   DrawCombatScreen(screen)
-			   return
-		   }
-	   } else {
-		   // Affichage principal hors menu
-		   DrawMap(screen)
-		   g.marchand.Draw(screen)
-		   g.player.DrawBars(screen)
-		   DrawMonsters(screen)
-		   DrawCombatMessage(screen)
-		   DrawCombatScreen(screen)
-		   g.inventaire.Draw(screen)
-	   }
+	if g.inMenu {
+		// Affichage du menu vidéo
+		if len(g.frames) > 0 && g.index < len(g.frames) {
+			opts := &ebiten.DrawImageOptions{}
+			opts.GeoM.Scale(
+				float64(screen.Bounds().Dx())/float64(g.frames[g.index].Bounds().Dx()),
+				float64(screen.Bounds().Dy())/float64(g.frames[g.index].Bounds().Dy()),
+			)
+			screen.DrawImage(g.frames[g.index], opts)
+		} else {
+			screen.Fill(color.Black)
+		}
+		if !g.videoEnded {
+			ebitenutil.DebugPrint(screen, "SAHARA DEFENDER\nVidéo en cours...")
+		} else {
+			ebitenutil.DebugPrint(screen, "SAHARA DEFENDER\nFin de la vidéo.\nClique Start ou Leave")
+		}
+		if inCombat {
+			DrawCombatScreen(screen)
+			return
+		}
+	} else {
+		// Affichage principal hors menu
+		DrawMap(screen)
+		g.marchand.Draw(screen)
+		g.player.DrawBars(screen)
+		DrawMonsters(screen)
+		DrawCombatMessage(screen)
+		DrawCombatScreen(screen)
+		g.inventaire.Draw(screen)
+	}
 
 }
 
 // Layout
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-		// Layout de la fenêtre (conserve la taille demandée)
-		return outsideWidth, outsideHeight
+	// Layout de la fenêtre (conserve la taille demandée)
+	return outsideWidth, outsideHeight
 }
 
 func Main() {
-	   // Initialisation du jeu
-	   LoadMap()           // Charge la map
-	   InitMonsters()      // Initialise les monstres
+	// Initialisation du jeu
+	LoadMap()      // Charge la map
+	InitMonsters() // Initialise les monstres
 
-	   game := NewGame()   // Crée l'instance principale
-	   gameInstance = game
+	game := NewGame() // Crée l'instance principale
+	gameInstance = game
 
-	   ebiten.SetFullscreen(true)
-	   ebiten.SetWindowTitle("SAHARA DEFENDER")
+	ebiten.SetFullscreen(true)
+	ebiten.SetWindowTitle("SAHARA DEFENDER")
 
-	   // Lancement de la musique en arrière-plan
-	   go func() {
-		   time.Sleep(500 * time.Millisecond)
-		   playMusic()
-	   }()
+	// Lancement de la musique en arrière-plan
+	go func() {
+		time.Sleep(500 * time.Millisecond)
+		playMusic()
+	}()
 
-	   // Démarrage de la boucle principale Ebiten
-	   if err := ebiten.RunGame(game); err != nil {
-		   log.Fatal(err)
-	   }
+	// Démarrage de la boucle principale Ebiten
+	if err := ebiten.RunGame(game); err != nil {
+		log.Fatal(err)
+	}
 
 }
