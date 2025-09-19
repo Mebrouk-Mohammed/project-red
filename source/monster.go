@@ -20,6 +20,7 @@ type Monster struct {
 	Speed      float64         // Vitesse du monstre
 	DirX, DirY float64         // Direction du mouvement
 	Health     int             // Points de vie du monstre
+	Damage     int
 }
 
 // Liste des monstres

@@ -55,7 +55,7 @@ func StartCombat(monster *Monster, playerImg *ebiten.Image) {
 
 	// Initialise l'entité monstre
 	hp := monster.Health
-	combatMonsterEntity = &Entity{Name: monster.Name, Health: hp}
+	combatMonsterEntity = &Entity{Name: monster.Name, Health: hp, Damage: 20}
 }
 
 // ----------------- Fin du combat -----------------
@@ -148,7 +148,7 @@ func UpdateCombat() {
 	} else {
 		// --- Tour du monstre ---
 		if combatMonsterEntity.Health > 0 {
-			damage := 20 // valeur par défaut, à adapter si besoin
+			damage := combatMonsterEntity.Damage
 			// Applique les dégâts au joueur réel
 			if gameInstance != nil && gameInstance.player != nil {
 				oldShield := gameInstance.player.Shield
