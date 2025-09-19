@@ -92,8 +92,7 @@ func UpdateMonsters() {
 		}
 	}
 
-	// Vérifier collisions avec le joueur
-	checkCollisionWithPlayer()
+	// ...collision combat gérée ailleurs...
 }
 
 // ----------------- Dessin des monstres -----------------
@@ -110,28 +109,7 @@ func DrawMonsters(screen *ebiten.Image) {
 
 // ----------------- Détection des collisions -----------------
 // Vérifie la collision entre le joueur et les monstres
-func checkCollisionWithPlayer() {
-	playerW, playerH := 64.0, 64.0 // taille approximative du joueur
-
-	for _, m := range monsters {
-		if len(m.Sprites) == 0 {
-			continue
-		}
-
-		monsterW, monsterH := m.Sprites[0].Size()
-
-		if playerX < m.X+float64(monsterW) &&
-			playerX+playerW > m.X &&
-			playerY < m.Y+float64(monsterH) &&
-			playerY+playerH > m.Y {
-			// Collision détectée → afficher le message
-			combatMessage = "DÉBUT DU COMBAT avec " + m.Name
-			return
-		}
-	}
-
-	combatMessage = "" // pas de combat
-}
+// ...fonction inutile supprimée...
 
 // ----------------- Dessin de la fenêtre combat -----------------
 // Dessine le message de combat à l'écran
